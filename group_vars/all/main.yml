@@ -1,0 +1,7 @@
+### Testing Multiple DPUs in an x86
+
+l_csi_0333d_dpus:
+  # _ dpu_oob
+  # _ dpu_oob2
+  - l_csi_bf2_25g_12
+  - l_csi_bf2_25g_04

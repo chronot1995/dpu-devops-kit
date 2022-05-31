@@ -1,0 +1,66 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+## This pulls in the variables file from the networking role
+## This is used in the last play to verify the DPU is back online
+
+- name: Checking if BFB has been downloaded
+  stat:
+    path: '/tmp/{{ doca_bfb }}'
+  register: bfbdownload
+
+- name: Download bfb from the Internet
+  get_url:
+    url: '{{ bfb_download_url }}'
+    dest: '/tmp'
+  when: not bfbdownload.stat.exists
+
+# Uncomment this task to print the plaintext password into /tmp/bf_plaintext.cfg
+# This is useful for debugging issues with the complex shell string used to generated the hashed config file.
+# - name: Writing plaintext Password
+#   shell: echo -n "ubuntu_PASSWORD='" > /tmp/bf_plaintext.cfg; echo -n $(echo '{{ hostvars[groups['dpus'][0]]['ansible_password'] }}') >> /tmp/bf_plaintext.cfg; echo "'" >> /tmp/bf_plaintext.cfg
+- name: Create Hashed Password for BF install
+  shell: set -o pipefail && echo -n "ubuntu_PASSWORD='" > /tmp/bf.cfg; echo -n $(echo '{{ hostvars[groups['dpus'][0]]['ansible_password'] }}' | openssl passwd -1 -stdin) >> /tmp/bf.cfg; echo "'" >> /tmp/bf.cfg # noqa 204
+  args:
+    executable: /bin/bash
+  changed_when: false
+  # [204] Lines should be no longer than 160 chars
+  # Unclear how to break this across lines successfully.
+  # The hostfile must contain a group called "dpus" or the above will fail
+
+- name: Load bfb into bf2...this will take a while # noqa 305
+  shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim0'
+  # [305] Use shell only when shell functionality is required
+  changed_when: false
+
+- name: Remove bf.cfg file
+  ansible.builtin.file:
+    path: /tmp/bf.cfg
+    state: absent
+
+- name: Pause for 2 minutes - DPU needs to catch its breath
+  pause:
+    minutes: 2
+
+- import_role:
+    name: rshim_check

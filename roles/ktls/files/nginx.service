@@ -1,0 +1,17 @@
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/usr/local/nginx/logs/nginx.pid
+WorkingDirectory=/tmp/nginx
+ExecStartPre=/tmp/nginx/objs/nginx -t
+ExecStart=/tmp/nginx/objs/nginx
+ExecReload=/tmp/nginx/objs/nginx -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+

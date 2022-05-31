@@ -1,0 +1,101 @@
+###
+##
+# This role needs an NGC api key as a variable/fact: ngc_api_key
+# - Can be set in this role's vars/main.yml
+# - If NGC CLI is installed and configured, it can get the API key from there
+# - You can prompt for the key with a vars_prompt and set it as a fact
+#
+
+- name: Ensure containerd is started
+  systemd:
+    state: started
+    name: containerd
+
+# Check if containerd already has auth to nvcr.io
+- name: Checking crictl pull for auth
+  command: crictl pull nvcr.io/nvidia/doca/doca_container_configs:1.2.0
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+  register: crictl_pull
+
+#- name: output var
+#  debug:
+#    var: crictl_pull
+
+# If that pull fails, setup the auth stuff
+- when: crictl_pull.stderr is regex("401 Unauthorized")
+#- when: crictl_pull.stderr is regex("401 Unauthorized") or crictl_pull.rc != 0
+  block:
+    - name: Ensure docker is started
+      systemd:
+        state: started
+        name: docker
+
+    ### If the ngc api key is not set, we might be able to find it
+    # If ngc cli is installed and setup, an API key is in there
+    - when: ngc_api_key is undefined
+      block:
+        - name: go fetch the ngc config file
+          fetch:
+            src: /root/.ngc/config
+            dest: /tmp/.ngc_config/
+            flat: true
+
+        - name: parse ngc config file for key
+          set_fact:
+            ngc_api_key: "{{ lookup('ini', 'apikey section=CURRENT file=/tmp/.ngc_config/config') }}"
+
+    - name: Check for ngc_api_key varible
+      fail:
+        msg: the ngc_api_key doesn't look right. Bail.
+      when: ngc_api_key is undefined or (ngc_api_key|length < 84)
+
+    # perform docker login with NGC api token to generate auth token
+    - name: perform docker login to nvcr.io
+      shell: echo {{ ngc_api_key }} | docker login nvcr.io --username '$oauthtoken' --password-stdin
+
+    # Get auth token from docker config to use in containerd config file
+    - name: get auth token
+      slurp:
+        src: /root/.docker/config.json
+      register: docker_config
+
+    - name: set auth token fact
+      set_fact:
+        docker_auth_token: "{{ (docker_config['content']|b64decode|from_json)['auths']['nvcr.io'].auth }}"
+
+    - name: Docker logout to clear key from file
+      command: docker logout nvcr.io
+
+    # update containerd config file with auth token
+    # it downloads the container directly
+    # need to uncomment three lines
+    - name: Uncomment nvcr.io registry config
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: '^#(      \[plugins."io.containerd.grpc.v1.cri".registry.configs\])'
+        replace: '\1'
+      notify: restart containerd
+
+    - name: Uncomment nvcr.io registry config
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: '^#(        \[plugins."io.containerd.grpc.v1.cri".registry.configs."nvcr.io".auth\])'
+        replace: '\1'
+      notify: restart containerd
+
+    - name: Uncomment nvcr.io registry config auth line and set auth
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: '^#          auth = "<Insert your auth token here>"'
+        replace: '          auth = "{{ docker_auth_token }}"'
+      notify: restart containerd
+
+    # this doesn't work and its frustrating
+    - name: Ensure auth token is set even if not commented
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: '^.*auth =.*$'
+        replace: '          auth = "{{ docker_auth_token }}"'
+      notify: restart containerd

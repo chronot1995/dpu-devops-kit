@@ -1,0 +1,7 @@
+#
+container_resources_path: "nvidia/doca/doca_container_configs"
+#
+# optional config for morpheus
+morpheus: true
+fluentd_aggregator_ip: 192.168.100.1
+fluentd_aggregator_port: 55555

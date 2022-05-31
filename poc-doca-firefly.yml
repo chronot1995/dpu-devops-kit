@@ -1,0 +1,74 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+- name: Confirm Deployment
+  hosts: dpus
+  become: yes
+  vars_prompt:
+    - name: "onward"
+      prompt: "Enabling Firefly requires separated host mode on the Bluefield DPU. This will affect all existing uses of the DPU. Are you sure you wish to deploy Firefly? (Yes/No)"
+      private: no
+      default: 'Yes'
+  tasks:
+    - name: Set Variables
+      set_fact:
+        #-> # kernel netdevs on dpu 
+        ptp_interface: p0
+        synce_interface: p0
+        #
+        #-> # Profile options are default, media, telcom_l2, telcom_l3 
+        # profile: "default"
+        # 
+        #-> # Options are either profile default config file or customized config file under /etc/firefly
+        # ptp_config_file: "profile_default"
+        # synce_config_file: "profile_default"
+
+    - name: onward
+      include_role:
+        name: onward
+
+    - name: Role - separated mode
+      include_role:
+        name: separated_mode
+
+    - name: Role - install_ngc_cli
+      include_role:
+        name: install_ngc_cli
+
+    - name: Role - ngc_containerd_setup
+      include_role:
+        name: ngc_containerd_setup
+
+    - name: Role - deploy_doca_firefly_container
+      include_role:
+        name: deploy_doca_firefly_container
+
+#    - name: include_role
+#      include_role:
+#        name: try_mlxfwreset_warmboot
+#      when: reboot_needed is defined and reboot_needed is true
+
+#    - name: Manual Cold Reboot/Hard Power Cycle needed
+#      debug:
+#        msg: "COLD REBOOD NEEDED"
+#      when: mlxfwreset_success is false

@@ -1,0 +1,5 @@
+# Global constants
+
+dpu_prometheus_user: "youruser@domain.com"
+dpu_grafana_api_key: "grafana-api-key-hashed"
+dpu_loki_user: "youruser@domain.com"

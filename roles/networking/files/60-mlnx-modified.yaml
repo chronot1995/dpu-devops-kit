@@ -1,0 +1,11 @@
+network:
+  ethernets:
+    enp3s0f0s0:
+      renderer: networkd
+      dhcp4: "true"
+      dhcp-identifier: mac
+    enp3s0f1s0:
+      renderer: networkd
+      dhcp4: "true"
+      dhcp-identifier: mac
+  version: 2

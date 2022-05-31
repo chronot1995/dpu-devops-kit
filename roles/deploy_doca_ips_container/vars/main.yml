@@ -1,0 +1,15 @@
+# Required variable - path to container resources on NGC
+container_resources_path: "nvidia/doca/doca_container_configs"
+
+## These variables are normally passed into this role
+## These vars get passed onto the create_sf_pair role that we include_roles for
+## The create_sf_pair role also has defauls in vars/main.yml
+#
+# aux_device_num1: 4
+# aux_device_num2: 5
+#
+#
+sf1_num: 11
+sf2_num: 21
+#
+# host_interface: pf0hpf
