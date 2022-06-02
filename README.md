@@ -14,13 +14,13 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-doca-ips-container.yml`](#-poc-doca-ips-containeryml-)
     - [`poc-doca-telemetry-container.yml`](#-poc-doca-telemetry-containeryml-)
     - [`poc-doca-url-filter-container.yml`](#-poc-doca-url-filter-containeryml-)
-    - [`poc-disable-host-restricted.yml`](#-poc-disable-host-restrictedyml-)
     - [`poc-doca-firefly.yml`](#-poc-doca-firefly.yml-)
     - [`poc-doca-dpu-morpheus.yml`](#-poc-doca-dpu-morpheus.yml-)
     - [`poc-doca-hbn.yml`](#-poc-doca-hbn.yml-)
     - [`poc-embedded-mode.yml`](#-poc-embedded-modeyml-)
-    - [`poc-enable-host-restricted.yml`](#-poc-enable-host-restrictedyml-)
     - [`poc-grafana.yml`](#-poc-grafanayml-)
+    - [`poc-host-restricted-disable.yml`](#-poc-disable-host-restrictedyml-)
+    - [`poc-host-restricted-enable.yml`](#-poc-enable-host-restrictedyml-)
     - [`poc-ktls.yml`](#-poc-ktlsyml-)
     - [`poc-reinstall-bfb.yml`](#-poc-reinstall-bfbyml-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
@@ -309,10 +309,6 @@ Sets up the environment for dpdk and checks if the hw can be initialized via tes
 
 Configures an Ubuntu server to be a DHCP server with ISC-DHCP. This is a basic configuration designed to help with POC/lab environments.
 
-### `poc-disable-host-restricted.yml`
-
-Disables restricted mode on the DPU.
-
 ### `poc-doca-all-containers.yml`
 
 Deploys 3x VFs on the host and all of the NGC containers on the DPU. Will prompt for NGC credentials and org if NGC is not installed and configured.
@@ -346,10 +342,6 @@ More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers
 
 Enables embedded mode on the DPU.
 
-### `poc-enable-host-restricted.yml`
-
-Enables restricted mode on the DPU.
-
 ### `poc-doca-firefly.yml`
 
 Deployes the DOCA Firefly PTP container. This changes your DPU to separated host mode and is not currently compatible with other embedded mode DPU use cases and functions.
@@ -366,9 +358,25 @@ Deploys the DOCA HBN (Host Based Networking) Service on the DPU. DOCA HBN provid
 
 Configures and deploys the Grafana Cloud monitoring agent unto the DPU
 
+### `poc-host-restricted-disable.yml`
+
+Disables restricted mode on the DPU.
+
+### `poc-host-restricted-enable.yml`
+
+Enables restricted mode on the DPU.
+
 ### `poc-ktls.yml`
 
 Builds and installs openssl and associated ktls enabled applications for demonstrating ktls offload
+
+### `poc-nic-mode-enable.yml`
+
+Disables NIC mode / Connect X mode on the DPU.
+
+### `poc-nic-mode-disable.yml`
+
+Disables NIC mode / Connect X mode on the DPU.
 
 ### `poc-reinstall-bfb.yml`
 

@@ -1,5 +1,12 @@
 # Release Notes
 
+### 6/2/2022
+
+1. Added support to enable NIC / ConnectX mode
+2. Added support to disable NIC / ConnectX mode
+3. Renamed the Restricted Host mode playbooks to use the same format as the NIC mode playbooks.
+4. Started a "Cheat Sheet" markdown page that can be used to record tips / tricks / troubleshooting for the DPU
+
 ### 5/19/2022
 
 1. Added support for Host-Based Networking (HBN)
