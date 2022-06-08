@@ -83,7 +83,7 @@
 
 # copy yaml file to kublet
 - name: Copy yaml file to kubelet.d
-  command: cp "/root/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_hbn.yaml" /etc/kubelet.d/doca_hbn.yaml
+  command: cp "/root/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_hbn.yaml" /etc/kubelet.d/doca_hbn.yaml
   # [204] Lines should be no longer than 160 chars
   changed_when: false
 

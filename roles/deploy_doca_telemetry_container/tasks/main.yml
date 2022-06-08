@@ -50,7 +50,7 @@
 # modify yaml file for morpheus
 - name: Update container init command for morpheus(fluentd)
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_telemetry.yaml"  # noqa 204
+    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_telemetry.yaml"  # noqa 204
     regexp: 'command:.*init.*'
     replace: 'command: ["/bin/bash", "-c", "/usr/bin/telemetry-init.sh && /usr/bin/enable-fluent-forward.sh {{ fluentd_aggregator_host }} {{ fluentd_aggregator_port }}"]'
   # [204] Lines should be no longer than 160 chars
@@ -58,7 +58,7 @@
 
 # copy yaml file to kublet
 - name: Copy yaml file to kubelet.d
-  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_telemetry.yaml" /etc/kubelet.d/doca_telemetry.yaml  # noqa 204
+  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_telemetry.yaml" /etc/kubelet.d/doca_telemetry.yaml  # noqa 204
   # [204] Lines should be no longer than 160 chars
   changed_when: false
 
