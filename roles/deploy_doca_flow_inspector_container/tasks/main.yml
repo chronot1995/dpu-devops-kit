@@ -127,7 +127,7 @@
 
 - name: Update SF_NUM_1 (mirrored port) in container config
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_path }}/doca_flow_inspector.yaml"  # noqa 204
+    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_flow_inspector.yaml"  # noqa 204
     regexp: 'SF_NUM_1\n.*value: \".*\"\n'
     replace: 'SF_NUM_1\n        value: "{{ aux_device_num }}"\n'
   # [204] Lines should be no longer than 160 chars
@@ -135,7 +135,7 @@
 # optional
 - name: Update SERVICE_ARGS to log at highest level
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_path }}/doca_flow_inspector.yaml"
+    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_flow_inspector.yaml"
     regexp: 'SERVICE_ARGS\n.*value: \".*\"\n'
     replace: 'SERVICE_ARGS\n        value: "--policy /flow_inspector/flow_inspector_cfg.json -l 4"\n'
   when: debug_level_log is true
@@ -181,7 +181,7 @@
 
 # copy yaml file to kublet
 - name: Copy yaml file to kubelet.d
-  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_path }}/doca_flow_inspector.yaml" /etc/kubelet.d/doca_flow_inspector.yaml  # noqa 204
+  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version }}/doca_flow_inspector.yaml" /etc/kubelet.d/doca_flow_inspector.yaml  # noqa 204
   changed_when: false
   # [204] Lines should be no longer than 160 chars
 
