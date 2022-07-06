@@ -1,7 +1,7 @@
 # check if ngc is configured/setup
 # Check if ngc cli is already installed
 - name: check for ngc cli  # noqa 305
-  shell: ngc --version
+  command: ngc --version
   environment:
     NGC_CLI_FORMAT_TYPE: JSON
   ignore_errors: True
@@ -47,12 +47,15 @@
     - name: Extract archive to install ngc
       unarchive:
         src: "/tmp/{{ ngc_cli_filename }}"
-        dest: /usr/local/sbin
+        dest: /tmp/
         copy: false
+
+    - name: Copy NGC CLI and deps
+      shell: cp -r /tmp/ngc-cli/* /usr/local/sbin/
 
 # check if ngc is configured/setup
 - name: check if ngc is setup
-  command: ngc diag user
+  shell: ngc diag user
   ignore_errors: True
   changed_when: false
   failed_when: false
