@@ -55,7 +55,7 @@
 
 # check if ngc is configured/setup
 - name: check if ngc is setup
-  shell: ngc diag user
+  command: ngc diag user
   ignore_errors: True
   changed_when: false
   failed_when: false
