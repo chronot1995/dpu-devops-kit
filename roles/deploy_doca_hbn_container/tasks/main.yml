@@ -102,7 +102,7 @@
   block:
     - name: Notify if DPU reboot needed
       debug:
-        msg: "You need to reboot the DPU to complete HBN Setup"
+        msg: "Rebootng the DPU to complete HBN Setup"
 
     - name: Rebooting DPU 
       shell: "sleep 3 && reboot"
@@ -116,14 +116,7 @@
         delay: 5
         timeout: 300
 
-   # Host driver may get out of sync when dpu reboots - reinit on the host side
-    - name: restart openibd driver on host
-      systemd:
-        name: openibd
-        state: restarted
-      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
-
 - name: Notify if Manual Cold Reboot/Hard Power Cycle needed
   debug:
-    msg: "You must Cold Reboot (Hard power cycle) the host to complete HBN setup"
+    msg: "You must manually Cold Reboot (Hard power cycle) the host to complete HBN setup"
   when: setup_script_stdout is regex("lease power cycle")
