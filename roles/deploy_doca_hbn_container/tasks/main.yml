@@ -60,10 +60,10 @@
 #        name: try_mlxfwreset_warmboot
       #when: reboot_needed is defined and reboot_needed is true
 
-- name: Notify if Manual Cold Reboot/Hard Power Cycle needed
-  debug:
-    msg: "You must Cold Reboot (Hard power cycle) for changes to take effect"
-  when: setup_script_stdout is regex("lease power cycle")
+#- name: Notify if Manual Cold Reboot/Hard Power Cycle needed
+#  debug:
+#    msg: "You must Cold Reboot (Hard power cycle) for changes to take effect"
+#  when: setup_script_stdout is regex("lease power cycle")
 #  when: mlxfwreset_success is false and setup_script_stdout is regex("lease power cycle")
 
 #- when: 
@@ -97,7 +97,33 @@
   # [204] Lines should be no longer than 160 chars
   changed_when: false
 
-- name: Ensure kubelet is started
-  systemd:
-    name: kubelet
-    state: started
+- name: Handle Only DPU Reboot
+  when: setup_script_stdout is regex("lease reboot DPU") and setup_script_stdout is not regex("lease power cycle")
+  block:
+    - name: Notify if DPU reboot needed
+      debug:
+        msg: "You need to reboot the DPU to complete HBN Setup"
+
+    - name: Rebooting DPU 
+      shell: "sleep 3 && reboot"
+      async: 1
+      poll: 0
+
+    - name: Wait for the reboot to complete
+      wait_for_connection:
+        connect_timeout: 10
+        sleep: 5
+        delay: 5
+        timeout: 300
+
+   # Host driver may get out of sync when dpu reboots - reinit on the host side
+    - name: restart openibd driver on host
+      systemd:
+        name: openibd
+        state: restarted
+      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
+
+- name: Notify if Manual Cold Reboot/Hard Power Cycle needed
+  debug:
+    msg: "You must Cold Reboot (Hard power cycle) the host to complete HBN setup"
+  when: setup_script_stdout is regex("lease power cycle")

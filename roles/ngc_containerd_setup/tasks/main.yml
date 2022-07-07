@@ -11,9 +11,9 @@
     state: started
     name: containerd
 
-# Check if containerd already has auth to nvcr.io
+# Check if containerd already has auth to pull containers nvcr.io
 - name: Checking crictl pull for auth
-  command: crictl pull nvcr.io/nvidia/doca/doca_container_configs:1.2.0
+  command: crictl pull nvcr.io/nvidia/doca/doca_url_filter:1.3.0
   failed_when: false
   ignore_errors: true
   changed_when: false
