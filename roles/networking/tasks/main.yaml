@@ -72,7 +72,7 @@
         dest: /etc/netplan/60-mlnx.yaml
       notify: apply netplan
   when:
-    - ansible_board_name is regex('^BlueField')
+    - ansible_board_name is defined and ansible_board_name is regex('^BlueField')
     - ansible_architecture is regex('^aarch64')
     - inventory_hostname in groups['dpus']
     - ansible_distribution == 'Ubuntu'
@@ -90,7 +90,7 @@
     #     src: 10-dhcp-ethernets.yaml
     #     dest: /etc/netplan/10-dhcp-ethernets.yaml
 
-    - name: Setup rshim IP address on the x86 host
+    - name: Setup rshim IP address on the x86 host (Ubuntu)
       template:
         src: templates/20-tmfifo-x86.j2
         dest: /etc/netplan/20-tmfifo.yaml
@@ -102,7 +102,7 @@
 
 - name: Configure tmfifo interfaces on RedHat / Centos
   block:
-    - name: Setup rshim IP address on the x86 hsot
+    - name: Setup rshim IP address on the x86 host (RHEL/CentOS)
       template:
         src: templates/ifcfg-tmfifo_net0.j2
         dest: /etc/sysconfig/network-scripts
