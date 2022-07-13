@@ -20,7 +20,3 @@ echo {{ item }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf_cfg/unbind
 sleep 1
 echo {{ item }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf/bind
 {% endfor %}
-
-#echo {{ (aux_interfaces_dict|dict2items)[0].key }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf_cfg/unbind
-#sleep 1
-#echo {{ (aux_interfaces_dict|dict2items)[0].key }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf/bind

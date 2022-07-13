@@ -58,6 +58,11 @@
       shell: crictl stopp `crictl pods | grep doca-telemetry-service-localhost.localdomain | cut -d' ' -f1`
       when: stat_result.stat.exists
 
+#    - name: Restart kubelet
+#      systemd:
+#        name: kubelet
+#        state: restarted
+  
     - name: Role - install_ngc_cli
       include_role:
         name: install_ngc_cli
@@ -76,6 +81,9 @@
     - name: Role - deploy_doca_flow_inspector_container
       include_role:
         name: deploy_doca_flow_inspector_container
+
+### The reboot DPU case still suffers from what seems to be a race condition between the two containers
+# usually need to restart the flow inspector container after a reboot
 
 #    - name: Reboot DPU
 #      shell: sleep 2 && reboot
