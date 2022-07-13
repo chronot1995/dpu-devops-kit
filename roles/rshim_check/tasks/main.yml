@@ -24,30 +24,63 @@
 ## This pulls in the variables file from the networking role
 ## This is used in the last play to verify the DPU is back online
 
+## rshim_num variable comes from
+
 # - import_role:
 #     name: networking
 
-- name: DPU rshim checks
+- name: DPU ipv4 rshim check
   block:
-    - name: Verify that the DPU's rshim interface has come online
+    - name: Verify that the DPU's own rshim interface has come online over ipv4
       wait_for:
         port: 22
-        delay: 20
+        delay: 5
         timeout: 450
         host: '{{ rshim_dpu }}'
   when:
     - inventory_hostname in groups['dpus']
 
-- name: x86 rshim checks
+# this ipv6 link local address will always be the same
+# as will tmfifo_net0
+- name: DPU ipv6 rshim check
   block:
-    - name: Verify that the x86's rshim interface has come online
+    - name: Verify that the DPU's own rshim interface has come online over ipv6
       wait_for:
         port: 22
-        delay: 20
+        delay: 5
+        timeout: 450
+        host: 'fe80::21a:caff:feff:ff01%tmfifo_net0'
+  when:
+    - inventory_hostname in groups['dpus']
+
+- name: x86 ipv4 rshim checks
+  block:
+    - name: Verify that the x86's own rshim interface has come online over ipv4
+      wait_for:
+        port: 22
+        delay: 5
         timeout: 450
         host: '{{ rshim_x86 }}'
   when:
     - inventory_hostname in groups['x86_hosts']
+
+#- name: debug
+#  debug:
+#    msg: "{{ hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['address'] + '%tmfifo_net' + rshim_num }}"
+
+## this checks host depends on the ssh_config.d/rshimX.conf file being dropped by the bfb_install role before
+## this sort of assumes that there is only one ipv6 address and it's the autoassigned link local
+- name: x86 ipv6 rshim checks
+  block:
+    - name: Verify that the x86's own rshim interface has come online over ipv6
+      wait_for:
+        port: 22
+        delay: 5
+        timeout: 30
+        host: "{{ hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['address'] + '%tmfifo_net' + rshim_num }}"
+  when:
+    - inventory_hostname in groups['x86_hosts']
+    - hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['scope'] == "link"
 
 - name: Best Practices
   meta: flush_handlers

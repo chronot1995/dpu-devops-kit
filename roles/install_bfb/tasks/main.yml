@@ -49,14 +49,21 @@
   # The hostfile must contain a group called "dpus" or the above will fail
 
 - name: Load bfb into bf2...this will take a while # noqa 305
-  shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim0'
+  shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
   # [305] Use shell only when shell functionality is required
   changed_when: false
 
 - name: Remove bf.cfg file
-  ansible.builtin.file:
+  file:
     path: /tmp/bf.cfg
     state: absent
+
+# this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
+- name: Ensure ssh config file is in place
+  template:
+    src: rshimX.conf.j2
+    dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
+    mode: 0644
 
 - name: Pause for 2 minutes - DPU needs to catch its breath
   pause:

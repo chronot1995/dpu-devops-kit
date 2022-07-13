@@ -115,9 +115,14 @@
     - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
   with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
 
+- name: SF - generate rando mac
+  set_fact:
+    sf_mac_address: "{{ '44:38:39' | random_mac }}"
+
 # if sf is inactive and detached, configure it
 - name: Configure SF
-  command: /opt/mellanox/iproute2/sbin/mlxdevm port function set {{ sf_index }} hw_addr {{ '44:38:39' | random_mac }} trust on state active
+#  command: /opt/mellanox/iproute2/sbin/mlxdevm port function set {{ sf_index }} hw_addr {{ '44:38:39' | random_mac }} trust on state active
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port function set {{ sf_index }} hw_addr {{ sf_mac_address }} trust on state active
   when:
     - item["value"]["function"].state == "inactive"
     - item["value"]["function"].opstate == "detached"
