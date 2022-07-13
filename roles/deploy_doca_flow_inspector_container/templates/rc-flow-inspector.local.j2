@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo '2048' | sudo tee -a /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+mkdir /mnt/huge
+mount -t hugetlbfs nodev /mnt/huge
+
+# add
+SF_NUM=`/opt/mellanox/iproute2/sbin/mlxdevm port add pci/{{ pci_id }} flavour pcisf pfnum {{ pfnum }} sfnum {{ sf_num }} | grep sfnum | cut -d":" -f3 | cut -d'/' -f2`
+
+# configure
+/opt/mellanox/iproute2/sbin/mlxdevm port function set pci/{{ pci_id }}/$SF_NUM hw_addr {{ sf_mac_address }} trust on state active
+
+sleep 1
+
+# deploy
+# aux_device_num is a dict that gets set from create_sf role
+
+{% for item in aux_interfaces_dict.keys() %}
+echo {{ item }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf_cfg/unbind
+sleep 1
+echo {{ item }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf/bind
+{% endfor %}
+
+#echo {{ (aux_interfaces_dict|dict2items)[0].key }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf_cfg/unbind
+#sleep 1
+#echo {{ (aux_interfaces_dict|dict2items)[0].key }}  > /sys/bus/auxiliary/drivers/mlx5_core.sf/bind

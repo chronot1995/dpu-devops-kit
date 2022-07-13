@@ -29,4 +29,6 @@ bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/
 # doca_bfb: "DOCA_v1.2.0_BlueField_OS_Ubuntu_20.04-5.4.0-1022-bluefield-5.5-1.0.3.2-3.8.0.11969-1.signed-aarch64.bfb"
 # DOCA 1.1 / BFB 3.7.1:
 # doca_bfb: "DOCA_v1.1_BlueField_OS_Ubuntu_20.04-5.4.0-1017.17.gf565efa-bluefield-5.4-2.4.1.3-3.7.1.11866-2.signed-aarch64.bfb"
-
+#
+# Leave me alone pls
+rshim_num: "0"

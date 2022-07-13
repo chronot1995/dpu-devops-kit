@@ -4,8 +4,12 @@ network:
       renderer: networkd
       dhcp4: "true"
       dhcp-identifier: mac
+      dhcp4-overrides:
+        route-metric: 200
     enp3s0f1s0:
       renderer: networkd
       dhcp4: "true"
       dhcp-identifier: mac
+      dhcp4-overrides:
+        route-metric: 200
   version: 2
