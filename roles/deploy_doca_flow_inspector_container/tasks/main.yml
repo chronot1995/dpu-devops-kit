@@ -50,24 +50,6 @@
 - name: Create a new trusted SF
   include_role:
     name: create_sf
-
-- name: Drop in rc.local file for SF and settings after reboot
-  template:
-    src: rc-flow-inspector.local.j2
-    dest: /etc/rc-flow-inspector.local
-    mode: 0755
-
-- name: Drop in systemd service file
-  copy:
-    src: rc-flow-inspector.local.service
-    dest: /usr/lib/systemd/system/rc-flow-inspector.local.service
-    mode: 0644
-
-- name: Enable flow inspector config service
-  systemd:
-    daemon_reload: yes
-    enabled: yes
-    name: rc-flow-inspector.local.service
  
 # This dict: aux_interfaces_dict gets set as a fact from the role above
 # There should only be one element [0] because this only creates one SF
