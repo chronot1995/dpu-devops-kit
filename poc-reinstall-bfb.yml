@@ -24,7 +24,6 @@
 - hosts: x86_hosts
   become: yes
   gather_facts: yes
-  gather_subset: min
   vars_prompt:
     - name: 'onward'
       prompt: 'Are you sure you want to reinstall and reset the Bluefield? (Yes/No)'
