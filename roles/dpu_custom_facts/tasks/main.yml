@@ -21,44 +21,20 @@
 #
 ###############################################################################
 
-- hosts: x86_hosts
-  become: yes
-  vars_prompt:
-    - name: 'onward'
-      prompt: 'Are you sure you want to reinstall and reset the Bluefield? (Yes/No)'
-      default: 'Yes'
-      private: no
-  roles:
-    - role: onward
-      tags: ['onward']
+- name: Drop in custom fact files
+  when:
+    - inventory_hostname in groups['dpus']
+  block:
+    - name: Create directory
+      file:
+        state: directory
+        path: /etc/ansible/facts.d/
+        mode: 0755
+        recurse: yes
 
-    - role: networking
-      tags: ['networking']
-
-    - role: install_bfb
-      tags: ['install_bfb']
-      when: onward|bool
-
-# Run this role quick after bfb install to drop custom facts
-# No need to gather facts here, but need to gather facts after this
-- hosts: dpus
-  become: yes
-  gather_facts: no
-  roles:
-    - role: dpu_custom_facts
-      tags: ['dpu_custom_facts']
-
-- hosts: dpus
-  become: yes
-  roles:
-    - role: reset_dpu_configuration
-      tags: ['reset_dpu_configuration']
-
-    - role: networking
-      tags: ['networking']
-
-- hosts: x86_hosts
-  become: yes
-  roles:
-    - role: reboot_os
-      tags: ['reboot_os']
+    - name: Drop files
+      copy:
+        src: "{{ item }}"
+        dest: /etc/ansible/facts.d/
+        mode: 0755
+      with_fileglob: "*"
