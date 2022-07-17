@@ -15,3 +15,19 @@ After the card comes back online, ssh into the card with the following credentia
 ssh root@<BMC IP>
 Password: 0penBmc
 ```
+
+2. View network devices
+
+```
+lshw -c network -json
+```
+
+3. Show version of DOCA:
+
+cat /etc/mlnx-release
+DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed
+
+4. Show version of DPDK:
+
+pkg-config --modversion libdpdk
+20.11.4.1.9
