@@ -1,3 +1,0 @@
-#!/bin/bash
-stat /dev/ipmi0 1>/dev/null 2>/dev/null && echo true || echo false
-

@@ -1,0 +1,64 @@
+#!/usr/bin/python3
+
+import json
+import os
+import subprocess
+
+bmc_info = {}
+
+
+# set bmc_enabled
+
+if os.path.exists("/dev/ipmi0"):
+    bmc_info["bmc_enabled"] = True
+else:
+    bmc_info["bmc_enabled"] = False
+
+
+##### Get BMC Network information
+
+# example output
+
+#root@localhost:/home/ubuntu# ipmitool lan print 1
+#Set in Progress         : Set Complete
+#Auth Type Support       : 
+#Auth Type Enable        : Callback : 
+#                        : User     : 
+#                        : Operator : 
+#                        : Admin    : 
+#                        : OEM      : 
+#IP Address Source       : DHCP Address
+#IP Address              : 192.168.1.117
+#Subnet Mask             : 255.255.255.0
+#MAC Address             : 10:70:fd:90:0d:10
+#Default Gateway IP      : 192.168.1.254
+#Default Gateway MAC     : 00:00:00:00:00:00
+#802.1q VLAN ID          : Disabled
+#RMCP+ Cipher Suites     : 17
+#Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+#                        :     X=Cipher Suite Unused
+#                        :     c=CALLBACK
+#                        :     u=USER
+#                        :     o=OPERATOR
+#                        :     a=ADMIN
+#                        :     O=OEM
+#Bad Password Threshold  : Not Available
+
+# Only if BMC is enabled, get ipmitool command output, format it, and split into list of lines
+if bmc_info["bmc_enabled"]:
+    ipmitool_lines = subprocess.run(["ipmitool","lan","print","1"], capture_output=True).stdout.decode('UTF-8').splitlines()
+
+    ### todo some sanity checking here ^^
+
+    # only care about lines 7 to 13 with IP address, mask, etc
+    for i in range(7, 13):
+        # split the line by that middle colon, and make it a nicely formatted json variable
+        bmc_info[ipmitool_lines[i].split(": ")[0].strip().lower().replace(" ", "_")] = ipmitool_lines[i].split(": ")[1].strip().lower().replace(" ", "_")
+
+
+
+
+
+
+# print the dict as json to stdout for ansible
+print(json.dumps(bmc_info))
