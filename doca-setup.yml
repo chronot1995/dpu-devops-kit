@@ -45,6 +45,14 @@
 
 - hosts: dpus
   become: yes
+  gather_facts: no
+  roles:
+    - role: dpu_custom_facts
+      tags: ['dpu_custom_facts']
+
+- hosts: dpus
+  become: yes
+  gather_facts: yes
   roles:
     - role: reset_dpu_configuration
       tags: ['reset_dpu_configuration']

@@ -69,5 +69,6 @@
   pause:
     minutes: 2
 
-- import_role:
+- name: Role - rshim_check
+  import_role:
     name: rshim_check
