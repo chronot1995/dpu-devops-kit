@@ -1,6 +1,13 @@
 ### DPU Cheat Sheet
 
-1. Reset the DPU's BMC Password:
+1. Gather the DPU Custom Facts
+
+```
+ansible-playbook install_custom_facts.yml
+ansible dpus -m setup -a 'filter=ansible_local' -b
+```
+
+2. Reset the DPU's BMC Password:
 
 To reset the BMC password, run the following from the DPU:
 
@@ -16,23 +23,23 @@ ssh root@<BMC IP>
 Password: 0penBmc
 ```
 
-2. View network devices
+3. View network devices
 
 ```
 lshw -c network -json
 ```
 
-3. Show version of DOCA:
+4. Show version of DOCA:
 
 cat /etc/mlnx-release
 DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed
 
-4. Show version of DPDK:
+5. Show version of DPDK:
 
 pkg-config --modversion libdpdk
 20.11.4.1.9
 
-5. Type of image:
+6. Type of image:
 
 Signed image = "GA Secured"
 
@@ -60,7 +67,7 @@ lifecycle state: Secured (development)
 secure boot key free slots: 3
 ```
 
-6. Reset the DPU from the x86 host:
+7. Reset the DPU from the x86 host:
 
 ```
 echo "SW_RESET 1" > /dev/rshim0/misc
@@ -72,8 +79,15 @@ as a sudo user:
 sudo bash -c "echo "SW_RESET 1" > /dev/rshim0/misc"
 ```
 
-7. Console connection from the x86 / host:
+8. Console connection from the x86 / host:
 
 ```
 sudo minicom -D /dev/rshim0/console -s
+```
+
+9. Verify Secure Boot:
+
+```
+ubuntu@localhost:~$ sudo mokutil --sb-state
+SecureBoot enabled
 ```
