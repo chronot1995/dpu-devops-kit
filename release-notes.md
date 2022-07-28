@@ -1,5 +1,10 @@
 # Release Notes
 
+### 7/27/2022
+
+1. Added reset-ovs role to remove, re-add, and reset OVS on the DPU
+2. Documentation misc updates
+
 ### 6/2/2022
 
 1. Added support to enable NIC / ConnectX mode

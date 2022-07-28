@@ -23,6 +23,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-host-restricted-enable.yml`](#-poc-enable-host-restrictedyml-)
     - [`poc-ktls.yml`](#-poc-ktlsyml-)
     - [`poc-reinstall-bfb.yml`](#-poc-reinstall-bfbyml-)
+    - [`poc-reset-ovs.yml`](#-poc-reset-ovs-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
     - ['poc-sshkeys.yml'](#-poc-sshkeys-)
   - [Using the PoC Kit](#using-the-poc-kit)
@@ -381,6 +382,10 @@ Disables NIC mode / Connect X mode on the DPU.
 ### `poc-reinstall-bfb.yml`
 
 Installs a fresh BFB image, networking, and utility software to the DPU
+
+### `poc-reset-ovs.yml`
+
+Delete, re-add, and reset Open VSwitch / OVS on the DPU. This is an easier step than reinstalling the BFB
 
 ### `poc-separated-mode.yml`
 
