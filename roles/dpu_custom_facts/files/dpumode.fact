@@ -1,0 +1,2 @@
+#!/bin/bash
+mlxconfig -d /dev/mst/mt41686_pciconf0 q | grep -i CPU_mode | xargs -l bash -c 'echo $1' | sed 's/^/"/;s/$/"/'
