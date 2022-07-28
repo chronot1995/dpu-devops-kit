@@ -1,4 +1,4 @@
-# Remove all configured OVS bridges
+# Reset OVS bridges
 
 This role will remove, re-add, and restart OVS in order to remove any custom / testing OVS rules.
 
