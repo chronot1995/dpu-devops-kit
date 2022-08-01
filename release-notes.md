@@ -63,7 +63,7 @@ Fixes:
 ### 04/5/2022
 
 1. Added a new section to the "README" file on how to instatiate an Automation Container using Docker or Lima. This will provide a base platform for running Ansible with the necessary dependencies
-2. Provided more details for those who are new to Git and how to clone the PoC Kit and what files to edit for your specific deployment
+2. Provided more details for those who are new to Git and how to clone the DevOps Kit and what files to edit for your specific deployment
 3. Created a "deprecated" folder under "roles" to clean up the repo
 4. Fixed the "poc-reinstall-bfb.yaml" playbook to align with the new networking role
 5. Edited the "README" file under the roles directory to reflect all of the currently defined roels

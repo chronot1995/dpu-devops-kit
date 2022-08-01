@@ -1,6 +1,6 @@
-# Contribute to the NVIDIA DPU PoC Kit
+# Contribute to the NVIDIA DPU DevOps Kit
 
-All PRs submitted to the PoC Kit project must be signed, see below for more information
+All PRs submitted to the DevOps Kit project must be signed, see below for more information
 
 ## Sign your work
 

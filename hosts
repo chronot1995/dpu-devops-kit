@@ -12,7 +12,7 @@ ngc_org=""
 # This is the IP address of the x86 host containing the DPU
 # This IP should be set to be something you can SSH to from the machine running Ansible
 # or if you are running Ansible directly on the host, 127.0.0.1
-# The "x86_hosts" group is required in the PoC Kit
+# The "x86_hosts" group is required in the DevOps Kit
 x86 ansible_host=10.150.170.174
 
 [x86_hosts:vars]
@@ -23,7 +23,7 @@ x86 ansible_host=10.150.170.174
 
 [dpus]
 # This is the IP address of the DPU OOB management interface.
-# The "dpus" group is required in the PoC Kit
+# The "dpus" group is required in the DevOps Kit
 dpu_oob ansible_host=10.150.106.174 parent_host=x86
 
 [dpus:vars]
