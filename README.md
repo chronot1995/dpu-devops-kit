@@ -1,9 +1,9 @@
-# DPU PoC Kit
+# DPU DevOps Kit
 
 This is a collection of Ansible Playbooks that simplifies the deployment and
 management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
 
-- [DPU PoC Kit](#dpu-poc-kit)
+- [DPU DevOps Kit](#dpu-poc-kit)
   - [Quick Start](#quick-start)
   - [Playbook Descriptions](#playbook-descriptions)
     - [`doca-setup.yml`](#-doca-setupyml-)
@@ -26,7 +26,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-reset-ovs.yml`](#-poc-reset-ovs-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
     - ['poc-sshkeys.yml'](#-poc-sshkeys-)
-  - [Using the PoC Kit](#using-the-poc-kit)
+  - [Using the DevOps Kit](#using-the-poc-kit)
     - [Install and Setup Ansible](#install-and-setup-ansible)
     - [Running the initial playbook](#running-the-initial-playbook)
     - [Re-install the BFB / Reset the PoC](#re-install-the-bfb---reset-the-poc)
@@ -44,11 +44,11 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
 
 ## Supported DPU + x86 / host platforms
 
-The PoC Kit has been tested on the following DPU platforms:
+The DevOps Kit has been tested on the following DPU platforms:
 
 1. Ubuntu 20.04 (DOCA 1.1.x - 1.3.x)
 
-The PoC Kit has been tested on the following x86 / host platforms:
+The DevOps Kit has been tested on the following x86 / host platforms:
 
 1. Ubuntu 20.04 (DOCA 1.1.x - 1.3.x)
 2. Centos 7.9.x (DOCA 1.2.x)
@@ -56,7 +56,7 @@ The PoC Kit has been tested on the following x86 / host platforms:
 
 ## Automation Container
 
-One great piece of feedback that we have received is that installing Ansible on various operating systems can lead to version mismatches which are difficult for new Ansible users to troubleshoot and debug. To help resolve this issue, the next few steps will outline how to install an "automation" conatiner which will have all of the needed dependencies for you to succesfully launch the PoC Kit.
+One great piece of feedback that we have received is that installing Ansible on various operating systems can lead to version mismatches which are difficult for new Ansible users to troubleshoot and debug. To help resolve this issue, the next few steps will outline how to install an "automation" conatiner which will have all of the needed dependencies for you to succesfully launch the DevOps Kit.
 
 Docker (Linux, Mac, Windows)
 
@@ -74,7 +74,7 @@ Docker (Linux, Mac, Windows)
 You will see the prompt change to something similar to the following:
 `root@032f1ada86f4:/ansible#`
 
-5. Clone the DPU PoC Kit with the following command:
+5. Clone the DPU DevOps Kit with the following command:
    `git clone https://gitlab.com/nvidia/networking/bluefield/dpu-poc-kit/`
 
 You will see the following output:
@@ -91,7 +91,7 @@ Receiving objects: 100% (614/614), 1.95 MiB | 17.25 MiB/s, done.
 Resolving deltas: 100% (248/248), done.
 ```
 
-6. Change directories into the PoC Kit:
+6. Change directories into the DevOps Kit:
    `cd dpu-poc-kit`
 
 7. Use vim or nano to edit the "hosts" file in this directory
@@ -168,7 +168,7 @@ INFO[0002] SSH Local Port: 60022
 You will see the prompt change to something similar to the following:
 `root@032f1ada86f4:/ansible#`
 
-5. Clone the DPU PoC Kit with the following command:
+5. Clone the DPU DevOps Kit with the following command:
    `git clone https://gitlab.com/nvidia/networking/bluefield/dpu-poc-kit/`
 
 You will see the following output:
@@ -185,7 +185,7 @@ Receiving objects: 100% (614/614), 1.95 MiB | 17.25 MiB/s, done.
 Resolving deltas: 100% (248/248), done.
 ```
 
-6. Change directories into the PoC Kit:
+6. Change directories into the DevOps Kit:
    `cd dpu-poc-kit`
 
 7. Use vim or nano to edit the "hosts" file in this directory
@@ -395,7 +395,7 @@ Enables separated mode on the DPU.
 
 Installs the SSH Keys on the DPU and x86 for passwordless authentication
 
-## Using the PoC Kit
+## Using the DevOps Kit
 
 ### Install and Setup Ansible
 
