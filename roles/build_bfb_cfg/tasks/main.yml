@@ -24,18 +24,11 @@
 ## This pulls in the variables file from the networking role
 ## This is used in the last play to verify the DPU is back online
 
-# Uncomment this task to print the plaintext password into /tmp/bf_plaintext.cfg
-# This is useful for debugging issues with the complex shell string used to generated the hashed config file.
-# - name: Writing plaintext Password
-#   shell: echo -n "ubuntu_PASSWORD='" > /tmp/bf_plaintext.cfg; echo -n $(echo '{{ hostvars[groups['dpus'][0]]['ansible_password'] }}') >> /tmp/bf_plaintext.cfg; echo "'" >> /tmp/bf_plaintext.cfg
-# - name: Create Hashed Password for BF install
-#   shell: set -o pipefail && echo -n "ubuntu_PASSWORD='" > /tmp/bf.cfg; echo -n $(echo '{{ hostvars[groups['dpus'][0]]['ansible_password'] }}' | openssl passwd -1 -stdin) >> /tmp/bf.cfg; echo "'" >> /tmp/bf.cfg # noqa 204
-#   args:
-#     executable: /bin/bash
-#   changed_when: false
-#   # [204] Lines should be no longer than 160 chars
-#   # Unclear how to break this across lines successfully.
-#   # The hostfile must contain a group called "dpus" or the above will fail
+- name: Build OOB Static IP Netplan file from the template
+  template:
+    src: network-config.j2
+    dest: /tmp/network-config
+    mode: 0755
 
 - name: Build bf.cfg file from the template
   template:

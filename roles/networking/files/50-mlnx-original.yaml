@@ -1,4 +1,4 @@
-ubuntu@localhost:~$ cat /etc/netplan/50-cloud-init.yaml
+# ubuntu@localhost:~$ cat /etc/netplan/50-cloud-init.yaml
 # This file is generated from information provided by the datasource.  Changes
 # to it will not persist across an instance reboot.  To disable cloud-init's
 # network configuration capabilities, write a file
