@@ -20,20 +20,21 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-# DOCA 1.4.0 / BFB 3.9.2
-doca_url: 'https://www.mellanox.com/downloads/DOCA/DOCA_v1.4.0'
-doca_file: 'doca-repo-aarch64-ubuntu2004-local_1.4.0079-1.5.7.1.0.2.0.bf.3.9.2.12271_arm64.deb'
-# DOCA 1.3.0 / BFB 3.9.0
-# doca_url: 'https://www.mellanox.com/downloads/DOCA/DOCA_v1.3.0'
-# doca_file: 'doca-repo-aarch64-ubuntu2004-local_1.3.0012-1.5.6.1.0.3.1.bf.3.9.0.12175_arm64.deb'
-# DOCA 1.2.1 / BFB 3.8.5
-# doca_url: "https://www.mellanox.com/downloads/DOCA/DOCA_v1.2.1"
-# doca_file: "doca-repo-aarch64-ubuntu2004-local_1.2.006-1.5.5.2.1.7.0.bf.3.8.5.12027_arm64.deb"
-#
-# DOCA 1.2 / BFB 3.8.0
-# doca_url: "https://content.mellanox.com/DOCA/DOCA_v1.2.0"
-# doca_file: "doca-repo-aarch64-ubuntu2004-local_1.2.006-1.5.5.1.0.3.2.bf.3.8.0.11969_arm64.deb"
-#
-# DOCA 1.1 / BFB 3.7.1
-# doca_url: "https://content.mellanox.com/DOCA/DOCA_v1.1.1"
-# doca_file: "doca-repo-aarch64-ubuntu2004-local_1.1.1-1.5.4.2.4.1.3.bf.3.7.1.11866_arm64.deb"
+- name: Start Mellanox Software Tools (mst)
+  shell: 'mst start' # noqa 305
+  changed_when: false
+  # [305] Use shell only when shell functionality is required
+
+- name: Grep BF device
+  shell: "set -o pipefail && mst status | grep -i '/dev/' | awk -F ' ' '{print $1}'" # noqa 305
+  args:
+    executable: /usr/bin/bash
+  register: grep_output
+  changed_when: false
+  # [305] Use shell only when shell functionality is required
+
+- name: Enable Link Type Infiniband on the DPU
+  shell: 'mlxconfig -y -d {{ grep_output.stdout }} set LINK_TYPE_P1=1 LINK_TYPE_P2=1' # noqa 305
+  changed_when: false
+  ignore_errors: yes
+  # [305] Use shell only when shell functionality is required

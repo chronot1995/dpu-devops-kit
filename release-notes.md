@@ -1,5 +1,15 @@
 # Release Notes
 
+### 8/3/2022
+
+1. Added DOCA 1.4.0 support
+2. Updated the server side / x86 packages for DOCA 1.3.0. As part of any major or minor release, the following will need to be updated:
+   i. roles/install_bfb/vars -> add the updated link to the new DOCA BFB file
+   ii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
+   iii. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
+3. Added support to change the link type for both ports to Ethernet
+4. Added support to change the link type for both ports to Infiniband
+
 ### 7/27/2022
 
 1. Added reset-ovs role to remove, re-add, and reset OVS on the DPU

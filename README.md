@@ -22,6 +22,8 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-host-restricted-disable.yml`](#-poc-disable-host-restrictedyml-)
     - [`poc-host-restricted-enable.yml`](#-poc-enable-host-restrictedyml-)
     - [`poc-ktls.yml`](#-poc-ktlsyml-)
+    - ['poc-link-type-ethernet.yml'](#-poc-link-type-ethernetyml)
+    - ['poc-link-type-infiniband.yml'](#-poc-link-type-infinibandyml)
     - [`poc-reinstall-bfb.yml`](#-poc-reinstall-bfbyml-)
     - [`poc-reset-ovs.yml`](#-poc-reset-ovs-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
@@ -370,6 +372,14 @@ Enables restricted mode on the DPU.
 ### `poc-ktls.yml`
 
 Builds and installs openssl and associated ktls enabled applications for demonstrating ktls offload
+
+### 'poc-link-type-ethernet.yml'
+
+Enable the Ethernet link type for the DPU
+
+### 'poc-link-type-infiniband.yml'
+
+Enable the Infiniband link type for the DPU
 
 ### `poc-nic-mode-enable.yml`
 
