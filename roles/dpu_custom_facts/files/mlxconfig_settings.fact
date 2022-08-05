@@ -60,5 +60,5 @@ for line in mlxconfig_lines:
   i = i + 1
 
 # print the dict as json to stdout for ansible
-#print(json.dumps(mlxconfig_info))
-print(json.dumps(mlxconfig_info, indent=4))
+print(json.dumps(mlxconfig_info))
+#print(json.dumps(mlxconfig_info, indent=4))
