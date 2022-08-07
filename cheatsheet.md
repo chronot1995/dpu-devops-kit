@@ -91,3 +91,15 @@ sudo minicom -D /dev/rshim0/console -s
 ubuntu@localhost:~$ sudo mokutil --sb-state
 SecureBoot enabled
 ```
+
+10. Serial Number of the DPU:
+
+```
+sudo dmidecode -t system | grep Serial
+```
+
+11. Git tip
+
+git checkout dmgr2 # gets you "on branch dmgr2"
+git fetch origin # gets you up to date with origin
+git merge origin/main
