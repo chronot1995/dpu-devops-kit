@@ -60,14 +60,17 @@
     - role: manage_bf2_fw
       tags: ['manage_bf2_fw']
 
+    # - role: link_type_ethernet
+    #   tags: ['link_type_ethernet']
+
     - role: networking
       tags: ['networking']
 
-#- hosts: dpus,x86_hosts
-#  become: yes
-#  roles:
-#    - role: install_utility_software
-#      tags: ['utility_software']
+- hosts: dpus,x86_hosts
+  become: yes
+  roles:
+    - role: install_utility_software
+      tags: ['utility_software']
 
 - hosts: x86_hosts
   become: yes

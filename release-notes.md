@@ -1,5 +1,16 @@
 # Release Notes
 
+### 8/3/2022
+
+1. Changed the name of the project from the "DPU PoC Kit" to the "DPU DevOps Kit"
+2. Added DOCA 1.4.0 support
+3. Updated the server side / x86 packages for DOCA 1.4.0. As part of any major or minor release, the following will need to be updated:
+   i. roles/install_bfb/vars -> add the updated link to the new DOCA BFB file
+   ii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
+   iii. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
+4. Added support to change the link type for both ports to Ethernet
+5. Added support to change the link type for both ports to Infiniband
+
 ### 7/27/2022
 
 1. Added reset-ovs role to remove, re-add, and reset OVS on the DPU
@@ -63,7 +74,7 @@ Fixes:
 ### 04/5/2022
 
 1. Added a new section to the "README" file on how to instatiate an Automation Container using Docker or Lima. This will provide a base platform for running Ansible with the necessary dependencies
-2. Provided more details for those who are new to Git and how to clone the PoC Kit and what files to edit for your specific deployment
+2. Provided more details for those who are new to Git and how to clone the DevOps Kit and what files to edit for your specific deployment
 3. Created a "deprecated" folder under "roles" to clean up the repo
 4. Fixed the "poc-reinstall-bfb.yaml" playbook to align with the new networking role
 5. Edited the "README" file under the roles directory to reflect all of the currently defined roels

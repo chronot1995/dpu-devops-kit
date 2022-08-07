@@ -6,4 +6,4 @@ This role will verify that the host operating system is one of the following:
 2. CentOS <7.6
 3. RedHat Enterprise Liunx (RHEL) 8.2
 
-The PoC Kit will stop and let the user know if the above requirements are not met.
+The DevOps Kit will stop and let the user know if the above requirements are not met.

@@ -1,0 +1,64 @@
+#!/usr/bin/python3
+
+import json
+import os
+import subprocess
+
+mlxconfig_info = {}
+
+#root@localhost:/home/ubuntu# mlxconfig -d /dev/mst/mt41686_pciconf0 -e q
+#
+#Device #1:
+#----------
+#
+#Device type:    BlueField2      
+#Name:           MBF2H516C-CECO_Ax
+#Description:    BlueField-2 P-Series DPU 100GbE Dual-Port QSFP56; integrated BMC; PCIe Gen4 x16; Secure Boot Enabled; Crypto Enabled; 16GB on-board DDR; 1GbE OOB management; Tall Bracket; FHHL
+#Device:         /dev/mst/mt41686_pciconf0
+#
+#Configurations:                              Default         Current         Next Boot
+#         MEMIC_BAR_SIZE                      0               0               0               
+#         MEMIC_SIZE_LIMIT                    _256KB(1)       _256KB(1)       _256KB(1)       
+#         HOST_CHAINING_MODE                  DISABLED(0)     DISABLED(0)     DISABLED(0)     
+#         HOST_CHAINING_CACHE_DISABLE         False(0)        False(0)        False(0)        
+#         HOST_CHAINING_DESCRIPTORS           Array[0..7]     Array[0..7]     Array[0..7]     
+#         HOST_CHAINING_TOTAL_BUFFER_SIZE     Array[0..7]     Array[0..7]     Array[0..7]     
+#The '*' shows parameters with next value different from default/current value.
+#
+
+# run the mlxconfig command, work with a list of lines
+mlxconfig_lines = subprocess.run(["mlxconfig", "-d", "/dev/mst/mt41686_pciconf0", "-e", "q"], capture_output=True).stdout.decode('UTF-8').splitlines()
+
+# init a line counter
+i = 0
+
+# may have different numbers of lines here depending on card/firmware, need to iterate through them all
+for line in mlxconfig_lines:
+  # The header seems pretty constant and the settings start at line 10.
+  if i > 9:
+    #print(line)
+    # split the line by the whitespace. get a list
+    split_line = line.split()
+
+    # lines with asterisks become lists with 5 elements. * is in index 0, so things are shifted over by one position
+    if len(split_line) == 5:
+      mlxconfig_info[split_line[1]] = {}
+      mlxconfig_info[split_line[1]]["Default"] = split_line[2].strip()
+      mlxconfig_info[split_line[1]]["Current"] = split_line[3].strip()
+      mlxconfig_info[split_line[1]]["Next Boot"] = split_line[4].strip()
+      mlxconfig_info[split_line[1]]["*"] = "True"
+
+    # lines without asterisks have 4 elements
+    if len(split_line) == 4:
+      mlxconfig_info[split_line[0]] = {}
+      mlxconfig_info[split_line[0]]["Default"] = split_line[1].strip()
+      mlxconfig_info[split_line[0]]["Current"] = split_line[2].strip()
+      mlxconfig_info[split_line[0]]["Next Boot"] = split_line[3].strip()
+      mlxconfig_info[split_line[0]]["*"] = "False"
+
+    # increment line counter
+  i = i + 1
+
+# print the dict as json to stdout for ansible
+print(json.dumps(mlxconfig_info))
+#print(json.dumps(mlxconfig_info, indent=4))

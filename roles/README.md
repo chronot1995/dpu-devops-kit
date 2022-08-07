@@ -1,4 +1,4 @@
-# DPU PoC Kit Roles
+# DPU DevOps Kit Roles
 
 Each folder in this directory provides configuration and files to preform DPU or x86 configuration and administration tasks.
 
@@ -28,11 +28,13 @@ Each directory is designed to be a reusable component and does not have any outs
 - `install_server_doca` - Installs the DOCA components on an Ubuntu 20.04 x86 host.
 - `install_utility_software` - Installs packages and configurations to improve the user experience.
 - `ktls` - KTLS offload proof of concept
+- `link_type_ethernet` - Enable Ethernet on the DPU
+- `link_type_infiniband` - Enable Infiniband on the DPU
 - `manage_bf2_fw` - Checks and updates DPU Firmware to the latest version.
 - `ngc_containerd_setup` - Component to setup and configure Containerd and Docker on the DPU
 - `networking` - Configures the IP address of the x86 and the DPU rshim
 - `onward` - An internal utility to handle "Yes/No" user input.
-- `precheck` - Verifies the x86 is supported by the PoC Kit
+- `precheck` - Verifies the x86 is supported by the DevOps Kit
 - `reboot_os` - Reboots a host and waits for it to be accessible again.
 - `remove_ovs` - Removes all configured OVS bridges.
 - `reset_ovs` - Remove, re-add, and restarts OVS. This effectively clears OVS without reinstalling the BFB

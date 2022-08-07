@@ -1,6 +1,6 @@
-- name: Verify DPU PoC Kit requirements
+- name: Verify DPU DevOps Kit requirements
   fail:
-    msg: 'The PoC Kit will only install on a supported x86 / host platform. Please view the main "README.md" file. You are running {{ansible_distribution}} {{ansible_distribution_release}} {{ansible_distribution_version}}'
+    msg: 'The DevOps Kit will only install on a supported x86 / host platform. Please view the main "README.md" file. You are running {{ansible_distribution}} {{ansible_distribution_release}} {{ansible_distribution_version}}'
   when:
     - not (ansible_distribution == "Ubuntu" and ansible_distribution_release == "focal" and ansible_distribution_version == "20.04")
     - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" and ansible_distribution_version >= "7.6")

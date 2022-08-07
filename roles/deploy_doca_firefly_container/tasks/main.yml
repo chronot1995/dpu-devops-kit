@@ -23,12 +23,12 @@
 
 ### WARNING: This role only deploys the container from NGC
 ## As of April/May DOCA 1.3 release, Firefly is not GA and uses separated host mode
-## Separated host mode must be enabled separately from this role. The DPU PoC kit has a role to do this
+## Separated host mode must be enabled separately from this role. The DPU DevOps Kit has a role to do this
 
 - name: Check PTP and SYNCE_INTERFACE interfaces exist
   fail:
-    msg: "ptp_interface and/or synce_interface do not exist. Check vars and check system/target that the intefaces exist. Set as fact in playbook or set in role vars"
-  when: 
+    msg: 'ptp_interface and/or synce_interface do not exist. Check vars and check system/target that the intefaces exist. Set as fact in playbook or set in role vars'
+  when:
     - hostvars[inventory_hostname]['ansible_' + ptp_interface].device is undefined
     - hostvars[inventory_hostname]['ansible_' + synce_interface].device is undefined
 
@@ -40,7 +40,7 @@
   block:
     - name: Real time clock setting already enabled
       debug:
-        msg: "RTC seems to be already set. Skipping"
+        msg: 'RTC seems to be already set. Skipping'
 
     - name: Set flag already enabled
       set_fact:
@@ -63,7 +63,7 @@
 
 - name: Manual Cold Reboot/Hard Power Cycle needed
   debug:
-    msg: "COLD REBOOD NEEDED"
+    msg: 'COLD REBOOD NEEDED'
   when: mlxfwreset_success is false
 
 # check first, then set it?
@@ -86,7 +86,7 @@
 
     # may fail if mlxconfig settings aren't set. May need a cold reboot. Just fail and move on
     - name: Set ethtool config
-      command: "ethtool --set-priv-flags {{ ptp_interface }} tx_port_ts on"
+      command: 'ethtool --set-priv-flags {{ ptp_interface }} tx_port_ts on'
       register: ethtool_set_output
       when: mlxfwreset_success is true or (reboot_needed is undefined or reboot_needed is false)
       ignore_errors: true
@@ -99,7 +99,7 @@
 
 - name: check version
   set_fact:
-    container_resources_version: "{{ (container_config_info.stdout|from_json).latestVersionIdStr }}"
+    container_resources_version: '{{ (container_config_info.stdout|from_json).latestVersionIdStr }}'
 
 - name: Pull container resources files
   command:
@@ -110,40 +110,40 @@
 
 - name: Update PTP PROFILE
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml" 
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
     regexp: 'PROFILE\n.*value: \".*\"\n'
     replace: 'PROFILE\n          value: "{{ ptp_profile }}"\n'
   when: ptp_profile is defined
 
 - name: Update PTP_INTERFACE
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml"
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
     regexp: 'PTP_INTERFACE\n.*value: \".*\"\n'
     replace: 'PTP_INTERFACE\n          value: "{{ ptp_interface }}"\n'
 
 - name: Update SYNCE_INTERFACE
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml"
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
     regexp: 'SYNCE_INTERFACE\n.*value: \".*\"\n'
     replace: 'SYNCE_INTERFACE\n          value: "{{ synce_interface }}"\n'
 
 - name: Update PTP_CONFIG_FILE
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml"  
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
     regexp: 'PTP_CONFIG_FILE\n.*value: \".*\"\n'
     replace: 'PTP_CONFIG_FILE\n          value: "{{ ptp_config_file }}"\n'
   when: ptp_config_file is defined
 
 - name: Update SYNCE_CONFIG_FILE
   replace:
-    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml"
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
     regexp: 'SYNCE_CONFIG_FILE\n.*value: \".*\"\n'
     replace: 'SYNCE_CONFIG_FILE\n          value: "{{ synce_config_file }}"\n'
   when: synce_config_file is defined
 
 # copy yaml file to kublet
 - name: Copy yaml file to kubelet.d
-  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml" /etc/kubelet.d/doca_firefly.yaml  # noqa 204
+  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml" /etc/kubelet.d/doca_firefly.yaml # noqa 204
   # [204] Lines should be no longer than 160 chars
   changed_when: false
 
@@ -151,7 +151,6 @@
   systemd:
     name: kubelet
     state: started
-
 # ptp_interface is ready to use
 #
 # configure ip for the interface:
