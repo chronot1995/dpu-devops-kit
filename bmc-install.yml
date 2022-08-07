@@ -21,31 +21,34 @@
 #
 ###############################################################################
 
-- hosts: x86_hosts
+# - hosts: x86_hosts
+#   become: yes
+# vars_prompt:
+#   - name: 'bfb_prompt'
+#     prompt: 'Would you like to install a new BFB on the Bluefield? (Yes/No)'
+#     default: 'Yes'
+#     private: no
+# roles:
+# - role: precheck
+#   tags: ['precheck']
+
+# - role: install_server_doca
+#   tags: ['server_doca']
+
+# - role: networking
+#   tags: ['networking']
+
+# - role: install_bfb_bmc
+#   tags: ['install_bfb_bmc']
+# when:
+#   - bfb_prompt|bool
+
+- hosts: dpus
   become: yes
-  # vars_prompt:
-  #   - name: 'bfb_prompt'
-  #     prompt: 'Would you like to install a new BFB on the Bluefield? (Yes/No)'
-  #     default: 'Yes'
-  #     private: no
+  gather_facts: no
   roles:
-    # - role: precheck
-    #   tags: ['precheck']
-
-    # - role: install_server_doca
-    #   tags: ['server_doca']
-
-    # - role: networking
-    #   tags: ['networking']
-
     - role: install_bfb_bmc
       tags: ['install_bfb_bmc']
-      # when:
-      #   - bfb_prompt|bool
-# - hosts: dpus
-#   become: yes
-#   gather_facts: no
-#   roles:
 #     - role: dpu_custom_facts
 #       tags: ['dpu_custom_facts']
 

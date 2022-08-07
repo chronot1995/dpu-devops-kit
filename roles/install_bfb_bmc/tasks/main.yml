@@ -38,7 +38,8 @@
   when: not bfbdownload.stat.exists
 
 - name: local scp — copy key file into authorized_keys
-  local_action: "sshpass -p '{{ ansible_password}}' scp -r {{ ansible_user }}@{{ inventory_hostname }}:/tmp/{{ doca_bfb }} /dev/rshim0/boot"
+  raw: "sshpass -p '{{ ansible_password}}' scp -r {{ ansible_user }}@{{ inventory_hostname }}:/tmp/{{ doca_bfb }} /dev/rshim0/boot"
+  delegate_to: localhost
 
 # - name: Role - build_bfb_cfg
 #   import_role:
