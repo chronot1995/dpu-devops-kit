@@ -42,7 +42,7 @@
 
 - name: Debug4life
   fail:
-    - msg: 'Break!'
+    msg: 'Break!'
 
 - name: SCP BFB to BMC Rshim
   raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
