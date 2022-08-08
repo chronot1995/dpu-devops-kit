@@ -37,7 +37,14 @@
   delegate_to: localhost
   when: not bfbdownload.stat.exists
 
-- name: local scp — copy key file into authorized_keys
+- name: Enable Rshim on the BMC
+  raw: systemctl restart rshim
+
+- name: Debug4life
+  fail:
+    - msg: 'Break!'
+
+- name: SCP BFB to BMC Rshim
   raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
   delegate_to: localhost
 
