@@ -5,3 +5,5 @@ l_csi_0333d_dpus:
   # _ dpu_oob2
   - l_csi_bf2_25g_12
   - l_csi_bf2_25g_04
+
+chrony_timezone: 'America/Los_Angeles'

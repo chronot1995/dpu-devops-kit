@@ -23,6 +23,18 @@ ssh root@<BMC IP>
 Password: 0penBmc
 ```
 
+2.1. Use the microcom Console on the BMC:
+
+```
+systemctl stop rshim
+systemctl start rshim
+microcom /dev/rshim0/console
+```
+
+2.2. Exit microcom:
+
+Keystroke: "ctrl + x + a"
+
 3. View network devices
 
 ```
