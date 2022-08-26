@@ -1,5 +1,12 @@
 # Release Notes
 
+### 8/24/2022
+
+1. Added a template-based configuration for the bf.cfg file generation
+2. Early Access: Added support for updating a DPU via the onboard BMC.
+3. Separated the extra DPU software between the existing "install_utility_software" role and the "install_additional_software" role
+4. Added a timezone variable for the additional software at the group_vars level for easier access
+
 ### 8/3/2022
 
 1. Changed the name of the project from the "DPU PoC Kit" to the "DPU DevOps Kit"

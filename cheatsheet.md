@@ -97,6 +97,10 @@ sudo bash -c "echo "SW_RESET 1" > /dev/rshim0/misc"
 sudo minicom -D /dev/rshim0/console -s
 ```
 
+8.1 Exit Minicom:
+
+CTRL+Z, A, X
+
 9. Verify Secure Boot:
 
 ```

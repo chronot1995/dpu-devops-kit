@@ -59,7 +59,6 @@
 - name: Pause for 2 minutes - DPU needs to catch its breath
   pause:
     minutes: 2
-
-- name: Role - rshim_check
-  import_role:
-    name: rshim_check
+# - name: Role - rshim_check
+#   import_role:
+#     name: rshim_check
