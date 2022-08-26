@@ -4,7 +4,7 @@ Each folder in this directory provides configuration and files to preform DPU or
 
 Each directory is designed to be a reusable component and does not have any outside dependencies.
 
-- `create_sf` - create Scalable Functions on the DPU
+- `build_bfb_cfg` - create the bf.cfg file for the DPU
 - `create_sf_pair` - create Scalable Functions on the DPU
 - `create_vfs` - Component to create Virtual Functions on the DPU
 - `deploy_doca_ar_container` - Deploys the Application Recognition container from NGC

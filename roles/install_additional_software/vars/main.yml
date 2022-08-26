@@ -22,4 +22,4 @@
 ###############################################################################
 
 # Time
-# chrony_timezone: "America/Chicago"
+chrony_timezone: "America/Chicago"

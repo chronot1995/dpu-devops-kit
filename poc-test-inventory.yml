@@ -21,5 +21,8 @@
 #
 ###############################################################################
 
-# Time
-# chrony_timezone: "America/Chicago"
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - action: ping

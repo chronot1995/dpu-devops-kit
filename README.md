@@ -71,7 +71,7 @@ Docker (Linux, Mac, Windows)
    `sudo docker run -it -d ipspace/automation:ubuntu`
 
 4. Next, log into the container with the following command:
-   `sudo docker exec -it $(sudo docker ps | grep -i auto | awk -F" " '{print $1}') bash`
+   `sudo docker exec -it $(sudo docker ps | grep -i automation | awk -F" " '{print $1}') bash`
 
 You will see the prompt change to something similar to the following:
 `root@032f1ada86f4:/ansible#`

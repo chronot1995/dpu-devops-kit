@@ -28,33 +28,43 @@
   stat:
     path: '/tmp/{{ doca_bfb }}'
   register: bfbdownload
+  delegate_to: localhost
 
 - name: Download bfb from the Internet
   get_url:
     url: '{{ bfb_download_url }}'
     dest: '/tmp'
+  delegate_to: localhost
   when: not bfbdownload.stat.exists
 
-- name: Role - build_bfb_cfg
-  import_role:
-    name: build_bfb_cfg
+- name: Enable Rshim on the BMC
+  raw: systemctl restart rshim
 
-- name: Load bfb into bf2...this will take a while # noqa 305
-  shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
-  # [305] Use shell only when shell functionality is required
-  changed_when: false
+- name: SCP BFB to BMC Rshim
+  raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
+  delegate_to: localhost
 
-- name: Remove bf.cfg file
-  file:
-    path: /tmp/bf.cfg
-    state: absent
+# - name: Role - build_bfb_cfg
+#   import_role:
+#     name: build_bfb_cfg
+#   delegate_to: localhost
 
-# this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
-- name: Ensure ssh config file is in place
-  template:
-    src: rshimX.conf.j2
-    dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
-    mode: 0644
+# - name: Load bfb into bf2...this will take a while # noqa 305
+#   shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
+#   # [305] Use shell only when shell functionality is required
+#   changed_when: false
+
+# - name: Remove bf.cfg file
+#   file:
+#     path: /tmp/bf.cfg
+#     state: absent
+
+# # this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
+# - name: Ensure ssh config file is in place
+#   template:
+#     src: rshimX.conf.j2
+#     dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
+#     mode: 0644
 
 - name: Pause for 2 minutes - DPU needs to catch its breath
   pause:

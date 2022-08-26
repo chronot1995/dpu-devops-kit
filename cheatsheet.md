@@ -23,6 +23,18 @@ ssh root@<BMC IP>
 Password: 0penBmc
 ```
 
+2.1. Use the microcom Console on the BMC:
+
+```
+systemctl stop rshim
+systemctl start rshim
+microcom /dev/rshim0/console
+```
+
+2.2. Exit microcom:
+
+Keystroke: "ctrl + x + a"
+
 3. View network devices
 
 ```
@@ -85,9 +97,25 @@ sudo bash -c "echo "SW_RESET 1" > /dev/rshim0/misc"
 sudo minicom -D /dev/rshim0/console -s
 ```
 
+8.1 Exit Minicom:
+
+CTRL+Z, A, X
+
 9. Verify Secure Boot:
 
 ```
 ubuntu@localhost:~$ sudo mokutil --sb-state
 SecureBoot enabled
 ```
+
+10. Serial Number of the DPU:
+
+```
+sudo dmidecode -t system | grep Serial
+```
+
+11. Git tip
+
+git checkout dmgr2 # gets you "on branch dmgr2"
+git fetch origin # gets you up to date with origin
+git merge origin/main

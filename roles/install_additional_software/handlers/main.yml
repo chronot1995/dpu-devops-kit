@@ -20,53 +20,18 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
+---
+- name: restart dhcp
+  service:
+    name: isc-dhcp-server
+    state: restarted
 
-- name: Install Common Utilities
-  apt:
-    name:
-      - bat
-      - dnsutils
-      - git
-      - htop
-      - lldpd
-      - minicom
-      - sshpass
-      - traceroute
-      - tree
-      - vim
-    state: present
-    update_cache: yes
-  register: apt_res
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: Install x86 Host Utilities
-  apt:
-    name:
-      - pv
-  when: ansible_architecture == "x86_64" and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-
-- name: Install DPU Host Utilities
-  apt:
-    name:
-      - ctop
-  when: ansible_architecture == "aarch64" and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-
-- name: Set Time Zone
-  timezone:
-    name: '{{ chrony_timezone }}'
-  notify: restart chrony
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: Correct LLDP Settings
-  lineinfile:
-    dest: /etc/lldpd.d/port_info.conf
-    line: 'configure lldp portidsubtype ifname'
-    create: yes
-  notify: restart LLDP
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: Autostart LLDP
+- name: restart LLDP
   service:
     name: lldpd
-    enabled: yes
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    state: restarted
+
+- name: restart chrony
+  service:
+    name: chrony
+    state: restarted

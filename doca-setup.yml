@@ -72,6 +72,9 @@
     - role: install_utility_software
       tags: ['utility_software']
 
+    - role: install_additional_software
+      tags: ['additional_software']
+
 - hosts: x86_hosts
   become: yes
   roles:
