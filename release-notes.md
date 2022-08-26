@@ -6,6 +6,7 @@
 2. Early Access: Added support for updating a DPU via the onboard BMC.
 3. Separated the extra DPU software between the existing "install_utility_software" role and the "install_additional_software" role
 4. Added a timezone variable for the additional software at the group_vars level for easier access
+5. Inventory test playbook for troubleshooting purposes
 
 ### 8/3/2022
 
