@@ -214,7 +214,7 @@ ansible_password=ubuntu
 8. Test out the Ansible playbook with the following command:
 
 ```
-ansible all -m ping --become
+ansible-playbook poc-test-inventory.yml
 ```
 
 This should produce an output similar to the following:
@@ -242,8 +242,6 @@ Other examples from tools such as Podman are welcome
 
 ## Installing Unsigned / Developer Images
 
-## Installing Unsigned / Developer Images
-
 Some of the Bluefield-2 cards have "unsigned" or development images that are available to internal NVIDIA resources. Currently, the only way to view if the card is a signed or unsigned / development card is to run the following command from the DPU:
 
 ```
@@ -256,7 +254,7 @@ A signed card will have the following:
 lifecycle state: GA Secured
 ```
 
-An unsigned / development care will have the following:
+An unsigned / development card will have the following:
 
 ```
 lifecycle state: GA Non-Secured
@@ -291,6 +289,7 @@ This is the playbook to get an x86 host and DPU fully ready to run DOCA applicat
 - Installs the DPU BFB image (if `bfb_install` is set to true)
 - Sets the x86 Rshim IP address
 - Updates the DPU firmware
+- Properly configures networking on the DPU and x86 host
 - Installs packages to improve the user experience on both x86 and DPU
 - Reboots the x86 host
 

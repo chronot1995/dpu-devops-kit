@@ -119,3 +119,10 @@ sudo dmidecode -t system | grep Serial
 git checkout dmgr2 # gets you "on branch dmgr2"
 git fetch origin # gets you up to date with origin
 git merge origin/main
+
+12. Serial via Redfish:
+
+```
+curl --insecure -u root:password https://<idrac IP>/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Slot.5 | jq | grep -i Serial
+"SerialNumber": "MT2150#####"
+```
