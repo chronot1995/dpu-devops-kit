@@ -12,7 +12,7 @@ ngc_org=""
 # This is the IP address of the x86 host containing the DPU
 # This IP should be set to be something you can SSH to from the machine running Ansible
 # or if you are running Ansible directly on the host, 127.0.0.1
-# The "x86_hosts" group is required in the DevOps Kit
+# The "x86_hosts" group is required in the PoC Kit
 x86 ansible_host=10.150.170.174
 
 [x86_hosts:vars]
@@ -20,10 +20,19 @@ x86 ansible_host=10.150.170.174
 # ansible_user=nvidia
 # ansible_password=nvidia
 
+# Uncomment the [x86_host_bmcs] group and vars below in order to use the "reboot_os_redux" role
+
+# [x86_host_bmcs]
+# dpu_example_host_bmc ansible_host=10.10.10.10
+
+# [x86_host_bmcs:vars]
+# ansible_user=nvidia
+# ansible_password=nvidia
+
 
 [dpus]
 # This is the IP address of the DPU OOB management interface.
-# The "dpus" group is required in the DevOps Kit
+# The "dpus" group is required in the PoC Kit
 dpu_oob ansible_host=10.150.106.174 parent_host=x86
 
 [dpus:vars]
@@ -34,6 +43,15 @@ dpu_oob ansible_host=10.150.106.174 parent_host=x86
 # Uncomment this line if you are configuring the DHCP Server
 # and provide the MAC address of the DPU OOB Management Interface
 # oob_mac=04:3f:72:d9:fe:d2
+
+# Uncomment the [dpu_bmc] group and vars below in order to use the "reboot_os_redux" role
+
+# [dpu_bmcs]
+# dpu_example_bmc ansible_host=10.10.150.150 bmc_mac=10:10:10:10:10:10
+
+# [dpu_bmcs:vars]
+# ansible_user=nvidia
+# ansible_password=nvidia
 
 # [dhcpservers]
 # dhcpserver ansible_host=10.10.145.111
