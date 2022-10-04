@@ -1,5 +1,12 @@
 # Release Notes
 
+### 10/4/2022
+
+1. Added a new reboot role called "reboot_os_redux"
+2. This new role will reboot the onboard BMC / iDRAC when enabled or let the user know that they need to do a cold boot to apply changes.
+3. This is an EA feature and will continue to be vetted and revised
+4. Updated the docs for this feature as it has some specific requirements around group names in order to work properly
+
 ### 8/24/2022
 
 1. Added a template-based configuration for the bf.cfg file generation

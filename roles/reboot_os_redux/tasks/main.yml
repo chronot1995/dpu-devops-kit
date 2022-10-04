@@ -35,20 +35,19 @@
 
   when:
     - "hostvars[inventory_hostname + '_host'] is defined"
-    - "groups['x86_host_bmcs']"
+    - "groups['x86_host_bmcs'] is defined"
 
 - name: DPU with a BMC
   block:
     - name: Cold Reboot of the DPU BMC
       debug:
         msg: '**** IMPORTANT: DPU BMC Present. Cold Booting is coming in a future release. For now, please cold boot the x86 to apply the DPU settings ****'
-    # https://docs.nvidia.com/networking/display/BlueFieldDPUOSLatest/Deploying+DPU+OS+Using+BFB+from+Host#DeployingDPUOSUsingBFBfromHost-FirmwareUpgradeFirmwareUpgrade
 
     - meta: end_play
 
   when:
     - "hostvars[inventory_hostname + '_bmc'] is defined"
-    - "groups['dpu_bmcs']"
+    - "groups['dpu_bmcs'] is defined"
 
 - name: DPU without a host BMC / iDRAC or DPU BMC
   block:
