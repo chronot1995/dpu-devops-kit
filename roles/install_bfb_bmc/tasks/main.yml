@@ -40,9 +40,18 @@
 - name: Enable Rshim on the BMC
   raw: systemctl restart rshim
 
-- name: SCP BFB to BMC Rshim
-  raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
-  delegate_to: localhost
+# Take 1 - fail
+
+# - name: SCP BFB to BMC Rshim
+#   raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
+#   delegate_to: localhost
+
+# Take 2 - Ansible'ish copy
+
+- name: Copying BFB to BMC rshim
+  copy:
+    src: /tmp/{{ doca_bfb }}
+    dest: /dev/rshim0/boot
 
 # - name: Role - build_bfb_cfg
 #   import_role:
