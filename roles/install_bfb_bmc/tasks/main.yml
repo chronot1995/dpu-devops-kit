@@ -39,12 +39,17 @@
 
 - name: Enable Rshim on the BMC
   raw: systemctl restart rshim
+  register: scpattempt
 
 # Take 1 - fail
 
-- name: SCP BFB to BMC Rshim
-  shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-  delegate_to: localhost
+# - name: SCP BFB to BMC Rshim
+#   shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
+#   register: scpattempt
+#   delegate_to: localhost
+
+- debug:
+  msg: '{{ scpattempt }}'
 
 # Take 2 - Ansible'ish copy - fail
 # Error msg:   msg: failed to open a SFTP connection (EOF during negotiation)
