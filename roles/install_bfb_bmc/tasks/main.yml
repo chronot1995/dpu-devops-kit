@@ -49,7 +49,7 @@
 #   delegate_to: localhost
 
 - debug:
-  msg: '{{ scpattempt }}'
+    msg: '{{ scpattempt }}'
 
 # Take 2 - Ansible'ish copy - fail
 # Error msg:   msg: failed to open a SFTP connection (EOF during negotiation)
