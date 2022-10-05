@@ -21,7 +21,14 @@
 #
 ###############################################################################
 ---
-- name: reboot remote os
-  reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
+# This code does not apply new settings to the DPU
+
+# - name: reboot remote os
+#   reboot:
+#     reboot_timeout: "{{ reboot_timeout }}"
+#   when: x86_reboot|default(true)|bool
+
+- name: Manually Cold Boot the x86
+  debug:
+    msg: '**** IMPORTANT: Please cold boot the x86 to apply the DPU settings ****'
   when: x86_reboot|default(true)|bool
