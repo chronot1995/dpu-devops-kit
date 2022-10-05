@@ -39,14 +39,13 @@
 
 - name: Enable Rshim on the BMC
   raw: systemctl restart rshim
+
+# Take 1 - eh
+
+- name: SCP BFB to BMC Rshim
+  shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
   register: scpattempt
-
-# Take 1 - fail
-
-# - name: SCP BFB to BMC Rshim
-#   shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-#   register: scpattempt
-#   delegate_to: localhost
+  delegate_to: localhost
 
 - debug:
     msg: '{{ scpattempt }}'
