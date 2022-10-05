@@ -43,7 +43,7 @@
 # when:
 #   - bfb_prompt|bool
 
-- hosts: bmcs
+- hosts: dpu_bmcs
   become: yes
   gather_facts: no
   roles:
