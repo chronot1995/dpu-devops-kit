@@ -54,7 +54,7 @@
 - name: Set Time Zone
   timezone:
     name: '{{ chrony_timezone }}'
-  notify: restart chrony
+  # notify: restart chrony
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Correct LLDP Settings

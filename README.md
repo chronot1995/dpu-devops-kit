@@ -270,7 +270,7 @@ The variables to specify the install locations are the following:
 Here is an example of what the command line would look like for a "signed" image install of DOCA 1.3:
 
 ```
-ansible-playbook doca-setup.yml -e "doca_bfb='DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed.bfb' bfb_download_url='http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed.bfb'"
+ansible-playbook doca-setup.yml -e "doca_bfb='DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb' bfb_download_url='http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'"
 ```
 
 ## Playbook Descriptions

@@ -31,9 +31,22 @@ systemctl start rshim
 microcom /dev/rshim0/console
 ```
 
-2.2. Exit microcom:
+2.2. Exit microcom on the BMC:
 
 Keystroke: "ctrl + x + a"
+
+2.3 Use microcom on the x86:
+
+```
+systemctl stop rshim
+systemctl start rshim
+microcom -p /dev/rshim0/console
+```
+
+2.4. Exit microcom on the x86:
+
+Keystroke: "ctrl + \"
+"quit" at the prompt
 
 3. View network devices
 
