@@ -43,7 +43,7 @@
 # Take 1 - fail
 
 - name: SCP BFB to BMC Rshim
-  shell: 'sshpass -p {{ ansible_password }} scp -r {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot /tmp/{{ doca_bfb }}'
+  shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
   delegate_to: localhost
 
 # Take 2 - Ansible'ish copy - fail
