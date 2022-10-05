@@ -42,16 +42,17 @@
 
 # Take 1 - fail
 
-# - name: SCP BFB to BMC Rshim
-#   raw: "sshpass -p '{{ ansible_password }}' scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot"
-#   delegate_to: localhost
+- name: SCP BFB to BMC Rshim
+  shell: 'sshpass -p {{ ansible_password }} scp -r {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot /tmp/{{ doca_bfb }}'
+  delegate_to: localhost
 
-# Take 2 - Ansible'ish copy
+# Take 2 - Ansible'ish copy - fail
+# Error msg:   msg: failed to open a SFTP connection (EOF during negotiation)
 
-- name: Copying BFB to BMC rshim
-  copy:
-    src: /tmp/{{ doca_bfb }}
-    dest: /dev/rshim0/boot
+# - name: Copying BFB to BMC rshim
+#   copy:
+#     src: /tmp/{{ doca_bfb }}
+#     dest: /dev/rshim0/boot
 
 # - name: Role - build_bfb_cfg
 #   import_role:
