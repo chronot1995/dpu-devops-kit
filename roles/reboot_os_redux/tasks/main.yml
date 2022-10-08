@@ -34,7 +34,7 @@
     - meta: end_play
 
   when:
-    - "hostvars[inventory_hostname + '_host'] is defined"
+    - "hostvars[inventory_hostname + '_host_bmc'] is defined"
     - "groups['x86_host_bmcs'] is defined"
 
 - name: DPU with a BMC
