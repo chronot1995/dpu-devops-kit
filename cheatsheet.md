@@ -139,3 +139,21 @@ git merge origin/main
 curl --insecure -u root:password https://<idrac IP>/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Slot.5 | jq | grep -i Serial
 "SerialNumber": "MT2150#####"
 ```
+
+13. Docker notes:
+
+```
+sudo docker-compose stop
+sudo docker exec -it <container name> /bin/bash
+sudo docker ps
+sudo docker container stats
+sudo docker image ls
+sudo docker image rm <container ID>
+sudo docker stop <container name>
+```
+
+Manually copy a file to a Docker container:
+
+```
+sudo docker cp cumulusmibs4.3/. librenms:/opt/librenms/mibs/cumulus
+```

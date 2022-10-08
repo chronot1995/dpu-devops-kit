@@ -1,5 +1,9 @@
 # Release Notes
 
+### 10/x/2022
+
+1. Rewrote the default reboot_os play to let the user know that they will need to cold boot the DPU
+
 ### 10/4/2022
 
 1. Added a new reboot role called "reboot_os_redux"
