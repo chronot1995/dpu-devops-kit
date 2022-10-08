@@ -13,6 +13,9 @@ Supports the use of an extra variable `reboot_os=false` to not reboot the host O
   2. DPU with a BMC
   3. DPU without a BMC
 
+0. For iDRAC connectivity to work, you will need to enable "IPMI over LAN" within the iDRAC console. This setting is found:
+   iDRAC Settings > Network > Connectivity > Enable IPMI over LAN > "Enabled"
+
 1. x86 with a BMC / iDRAC
 
 There are two things that are required in order for this cold boot from the x86 to work. First, the name of the inventory item must be in the following format:

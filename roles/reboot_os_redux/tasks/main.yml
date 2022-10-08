@@ -28,7 +28,7 @@
     #     msg: '**** IMPORTANT: x86 BMC Present ****'
 
     - name: Cold Reboot of the x86 iDRAC
-      shell: ipmitool -I lanplus -U "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_user'] }}" -P "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_password'] }}" -H "{{ hostvars[inventory_hostname + '_host_bmc']['ansible_host'] }}" chassis power cycle
+      shell: ipmitool -U "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_user'] }}" -P "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_password'] }}" -H "{{ hostvars[inventory_hostname + '_host_bmc']['ansible_host'] }}" -I lanplus chassis power cycle
       delegate_to: localhost
 
     - meta: end_play
