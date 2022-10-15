@@ -37,20 +37,32 @@
   delegate_to: localhost
   when: not bfbdownload.stat.exists
 
-- name: Enable Rshim on the BMC
-  raw: systemctl restart rshim
+- name: Stop rshim on the BMC 1/2
+  ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
+
+- name: Start rshim on the BMC 2/2
+  ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
 # Take 1 - This process takes 15 mins, at least
 
 - name: SCP BFB to BMC Rshim
   shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-  register: scpattempt
+  register: scptobmc
   delegate_to: localhost
-  failed_when: scpattempt.rc != 1
+  failed_when: '"lost connection" not in scptobmc.stderr'
 
 - debug:
-    msg: '{{ scpattempt }}'
+    msg: '{{ scptobmc }}'
 
+- name: Poll the BMC SSH on the BMC
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ ansible_host }}'
+    delay: 10
+  register: verifybmc
+
+- debug:
+    msg: '{{ verifybmc }}'
 # Take 2 - Ansible'ish copy - fail
 # Error msg:   msg: failed to open a SFTP connection (EOF during negotiation)
 
