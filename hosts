@@ -1,38 +1,57 @@
-;[dhcpserver]
-;ubuntu20 ansible_connection=local ansible_host=10.10.145.111
-
-[x86_hosts]
-dpu_100gb_host ansible_host=10.10.145.113
-
-;[x86_hosts:vars]
-;ansible_user=ubuntu
-;ansible_password=ubuntu
-
-[x86_host_bmcs]
-dpu_100gb_host_bmc ansible_host=10.10.10.10
-
-[x86_host_bmcs:vars]
-ansible_user=admin
-ansible_password=ubuntu123
-
-[dpus]
-;dpu_25gb ansible_host=10.10.150.202 oob_mac=b8:ce:f6:bc:7c:92
-dpu_100gb ansible_host=10.10.150.204 oob_mac=10:70:fd:90:0c:cc
-
-[dpus:vars]
-ansible_user=ubuntu
-ansible_password=CumulusLinux!
-
-[dpu_bmcs]
-dpu_100gb_bmc ansible_host=10.10.150.203 bmc_mac=10:70:fd:90:0c:c0
-
-[dpu_bmcs:vars]
-ansible_user=root
-ansible_password=Rddbcica6X@MY4_7Q38a
-
 [all:vars]
-ansible_user=mcourtney
-ansible_password=asshole11
-ansible_sudo_pass=asshole11
+ansible_user=ubuntu
+ansible_password=ubuntu
+ansible_sudo_pass=ubuntu
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 discovered_interpreter_python="/usr/bin/python3"
+# these must be properly set if you wish to deploy DOCA Service containers from NGC
+ngc_api_key=""
+ngc_org=""
+
+[x86_hosts]
+# This is the IP address of the x86 host containing the DPU
+# This IP should be set to be something you can SSH to from the machine running Ansible
+# or if you are running Ansible directly on the host, 127.0.0.1
+# The "x86_hosts" group is required in the PoC Kit
+x86 ansible_host=10.150.170.174
+
+[x86_hosts:vars]
+# Uncomment this if the username or password is not "ubuntu"
+# ansible_user=nvidia
+# ansible_password=nvidia
+
+# Uncomment the [x86_host_bmcs] group and vars below in order to use the "reboot_os_redux" role
+
+# [x86_host_bmcs]
+# dpu_example_host_bmc ansible_host=10.10.10.10
+
+# [x86_host_bmcs:vars]
+# ansible_user=nvidia
+# ansible_password=nvidia
+
+
+[dpus]
+# This is the IP address of the DPU OOB management interface.
+# The "dpus" group is required in the PoC Kit
+dpu_oob ansible_host=10.150.106.174 parent_host=x86
+
+[dpus:vars]
+# Uncomment this if the username or password is not "ubuntu"
+# ansible_user=ubuntu
+# ansible_password=ubuntu
+
+# Uncomment this line if you are configuring the DHCP Server
+# and provide the MAC address of the DPU OOB Management Interface
+# oob_mac=04:3f:72:d9:fe:d2
+
+# Uncomment the [dpu_bmc] group and vars below in order to use the "reboot_os_redux" role
+
+# [dpu_bmcs]
+# dpu_example_bmc ansible_host=10.10.150.150 bmc_mac=10:10:10:10:10:10
+
+# [dpu_bmcs:vars]
+# ansible_user=nvidia
+# ansible_password=nvidia
+
+# [dhcpservers]
+# dhcpserver ansible_host=10.10.145.111
