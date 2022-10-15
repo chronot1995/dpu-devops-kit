@@ -46,7 +46,7 @@
 # Take 1 - This process takes 15 mins, at least
 
 - name: SCP BFB to BMC Rshim
-  shell: 'sshpass -p {{ ansible_password }} scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
+  shell: 'sshpass -p "{{ ansible_password }}" scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
   register: scptobmc
   delegate_to: localhost
   failed_when: '"lost connection" not in scptobmc.stderr'
@@ -63,13 +63,6 @@
 
 - debug:
     msg: '{{ verifybmc }}'
-# Take 2 - Ansible'ish copy - fail
-# Error msg:   msg: failed to open a SFTP connection (EOF during negotiation)
-
-# - name: Copying BFB to BMC rshim
-#   copy:
-#     src: /tmp/{{ doca_bfb }}
-#     dest: /dev/rshim0/boot
 
 # - name: Role - build_bfb_cfg
 #   import_role:
