@@ -49,7 +49,7 @@
   shell: 'sshpass -p "{{ ansible_password }}" scp /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
   register: scptobmc
   delegate_to: localhost
-  failed_when: '"lost connection" not in scptobmc.stderr'
+  failed_when: '"truncate" not in scptobmc.stderr'
 
 - debug:
     msg: '{{ scptobmc }}'
