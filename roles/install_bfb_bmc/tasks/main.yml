@@ -51,11 +51,13 @@
 - name: read files
   command: awk 1 {{ hostsfiles | join(' ') }}
   register: hosts_contents
+  delegate_to: localhost
 
 - name: create hosts file
   copy:
     dest: /tmp/
     content: "{{ hosts_contents.stdout_lines | unique |join('\n') }}"
+  delegate_to: localhost
 
 - name: Fail for debugging
   ansible.builtin.fail:
