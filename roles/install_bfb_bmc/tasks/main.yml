@@ -46,9 +46,13 @@
   shell: cat /tmp/bf.cfg /tmp/{{ doca_bfb }} > /tmp/new.bfb
   delegate_to: localhost
 
-- name: Fail for debugging
-  ansible.builtin.fail:
-    msg: Quitting yo
+- name: Setting a fact to parse the task ID
+  ansible.builtin.set_fact:
+  doca_bfb: new.bfb
+
+# - name: Fail for debugging
+#   ansible.builtin.fail:
+#     msg: Quitting yo
 
 - name: Stop rshim on the BMC 1/2
   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
