@@ -30,12 +30,12 @@
   register: bfbdownload
   delegate_to: localhost
 
-# - name: Download bfb from the Internet
-#   get_url:
-#     url: '{{ bfb_download_url }}'
-#     dest: '/tmp'
-#   delegate_to: localhost
-#   when: not bfbdownload.stat.exists
+- name: Download bfb from the Internet
+  get_url:
+    url: '{{ bfb_download_url }}'
+    dest: '/tmp'
+  delegate_to: localhost
+  when: not bfbdownload.stat.exists
 
 - name: Stop rshim on the BMC 1/2
   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
