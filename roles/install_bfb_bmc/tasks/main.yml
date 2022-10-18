@@ -37,16 +37,35 @@
   delegate_to: localhost
   when: not bfbdownload.stat.exists
 
+- name: Role - build_bfb_cfg
+  import_role:
+    name: build_bfb_cfg
+  delegate_to: localhost
+
+- name: Setting a fact to parse the task ID
+  ansible.builtin.set_fact:
+    hostsfiles:
+      - /tmp/bf.cfg
+      - /tmp/{{ doca_bfb }}
+
+- name: read files
+  command: awk 1 {{ hostsfiles | join(' ') }}
+  register: hosts_contents
+
+- name: create hosts file
+  copy:
+    dest: /tmp/
+    content: "{{ hosts_contents.stdout_lines | unique |join('\n') }}"
+
+- name: Fail for debugging
+  ansible.builtin.fail:
+    msg: Quitting yo
+
 - name: Stop rshim on the BMC 1/2
   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
 
 - name: Start rshim on the BMC 2/2
   ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
-
-# - name: SCP BFB to BMC Rshim - TESTING
-#   command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/tmp'
-#   register: scptobmc
-#   delegate_to: localhost
 
 # Take 1 - This process takes 15 mins, at least
 - name: SCP BFB to BMC Rshim
@@ -55,7 +74,7 @@
   # poll: 0
   register: scptobmc
   delegate_to: localhost
-  failed_when: '"Connection timed out" not in scptobmc.stderr'
+  failed_when: '"truncate" not in scptobmc.stderr'
 
 # - name: Check on the SCP task
 #   async_status:
@@ -77,11 +96,6 @@
 
 # - debug:
 #     msg: '{{ verifybmc }}'
-
-# - name: Role - build_bfb_cfg
-#   import_role:
-#     name: build_bfb_cfg
-#   delegate_to: localhost
 
 # - name: Load bfb into bf2...this will take a while # noqa 305
 #   shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'

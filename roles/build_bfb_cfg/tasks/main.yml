@@ -24,11 +24,11 @@
 ## This pulls in the variables file from the networking role
 ## This is used in the last play to verify the DPU is back online
 
-- name: Build OOB Static IP Netplan file from the template
-  template:
-    src: network-config.j2
-    dest: /tmp/network-config
-    mode: 0755
+# - name: Build OOB Static IP Netplan file from the template
+#   template:
+#     src: network-config.j2
+#     dest: /tmp/network-config
+#     mode: 0755
 
 - name: Build bf.cfg file from the template
   template:
