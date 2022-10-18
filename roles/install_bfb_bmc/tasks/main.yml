@@ -55,7 +55,7 @@
   poll: 0
   register: scptobmc
   delegate_to: localhost
-# failed_when: '"truncate" not in scptobmc.stderr'
+  failed_when: '"Connection timed out" not in scptobmc.stderr'
 
 - name: Check on the SCP task
   async_status:
