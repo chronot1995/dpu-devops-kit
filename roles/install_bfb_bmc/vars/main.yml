@@ -21,7 +21,8 @@
 #
 ###############################################################################
 # DOCA 1.4.0 / BFB 3.9.2:
-doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'
+doca_bfb: 'notes.txt'
+# doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'
 bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
 # DOCA 1.3.0 / BFB 3.9.0:
 # doca_bfb: 'DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed.bfb'
