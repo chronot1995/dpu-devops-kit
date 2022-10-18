@@ -42,16 +42,23 @@
     name: build_bfb_cfg
   delegate_to: localhost
 
-- name: Setting a fact to parse the task ID
+- name: Two files to concatenate
   ansible.builtin.set_fact:
     hostsfiles:
       - /tmp/bf.cfg
       - /tmp/{{ doca_bfb }}
 
-- name: read files
+- name: Read the file names
   command: awk 1 {{ hostsfiles | join(' ') }}
   register: hosts_contents
   delegate_to: localhost
+
+- debug:
+    msg: '{{ hosts_contents }}'
+
+- name: Fail for debugging
+  ansible.builtin.fail:
+    msg: Quitting yo
 
 - name: create hosts file
   copy:
