@@ -58,15 +58,15 @@
 - debug:
     msg: '{{ scptobmc }}'
 
-- name: Poll the BMC SSH on the BMC
-  ansible.builtin.wait_for:
-    port: 22
-    host: '{{ ansible_host }}'
-    delay: 10
-  register: verifybmc
+# - name: Poll the BMC SSH on the BMC
+#   ansible.builtin.wait_for:
+#     port: 22
+#     host: '{{ ansible_host }}'
+#     delay: 10
+#   register: verifybmc
 
-- debug:
-    msg: '{{ verifybmc }}'
+# - debug:
+#     msg: '{{ verifybmc }}'
 
 # - name: Role - build_bfb_cfg
 #   import_role:
