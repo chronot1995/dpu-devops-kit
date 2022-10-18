@@ -42,28 +42,8 @@
     name: build_bfb_cfg
   delegate_to: localhost
 
-- name: Two files to concatenate
-  ansible.builtin.set_fact:
-    hostsfiles:
-      - /tmp/bf.cfg
-      - /tmp/{{ doca_bfb }}
-
-- name: Read the file names
-  command: awk 1 {{ hostsfiles | join(' ') }}
-  register: hosts_contents
-  delegate_to: localhost
-
-- debug:
-    msg: '{{ hosts_contents }}'
-
-- name: Fail for debugging
-  ansible.builtin.fail:
-    msg: Quitting yo
-
-- name: create hosts file
-  copy:
-    dest: /tmp/
-    content: "{{ hosts_contents.stdout_lines | unique |join('\n') }}"
+- name: Add bf.cfg to BFB file
+  shell: cat /tmp/bf.cfg /tmp/{{ doca_bfb }} > /tmp/new.bfb
   delegate_to: localhost
 
 - name: Fail for debugging
