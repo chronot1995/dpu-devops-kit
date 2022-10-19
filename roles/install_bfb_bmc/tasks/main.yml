@@ -43,7 +43,7 @@
 - name: Yeet
   debug:
     msg: 'Yeet!'
-  when: boardtype== '0x44'
+  when: boardtype == '0x44'
 
 - name: Stop here
   ansible.builtin.fail:
