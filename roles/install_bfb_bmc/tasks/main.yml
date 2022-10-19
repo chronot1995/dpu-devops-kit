@@ -24,6 +24,27 @@
 ## This pulls in the variables file from the networking role
 ## This is used in the last play to verify the DPU is back online
 
+- name: Role - bmc_board_type
+  import_role:
+    name: bmc_board_type
+  register: boardtype
+
+- name: Output of boardtype
+  debug:
+    msg: "{{ boardtype.stdout.split(' ')[1] }}"
+
+- name: Set DOCA bfb file
+  ansible.builtin.set_fact:
+    boarded: "{{ boardtype.stdout.split(' ')[1] }}"
+
+- name: Output of boarded
+  debug:
+    msg: '{{ boarded }}'
+
+- name: Stop here
+  ansible.builtin.fail:
+    msg: Stop here - debug
+
 - name: Checking if BFB has been downloaded
   stat:
     path: '/tmp/{{ doca_bfb }}'
