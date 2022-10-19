@@ -1,0 +1,122 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+- name: Ask for host interface
+  pause:
+    prompt: Connect container to which host interface (on DPU)
+  register: host_interface_input
+  when: host_interface is undefined or host_interface|length < 6
+
+- name: Get host_interface from prompt
+  set_fact:
+    host_interface: "{{ host_interface_input['user_input'] }}"
+  when: host_interface_input['user_input'] is defined
+
+# Create two SFs for this container
+- name: Create two SFs
+  include_role:
+    name: create_sf_pair
+
+# This dict should get set as a fact from the role above
+- when: aux_interfaces_dict is defined
+  block:
+    - name: find aux_device_num1 index
+      set_fact:
+        aux_device_num1: "{{ (aux_interfaces_dict|dict2items)[0].key | regex_replace('^mlx5_core.sf.(.*)$', '\\1') }}"
+
+    - name: find aux_device_num2 index
+      set_fact:
+        aux_device_num2: "{{ (aux_interfaces_dict|dict2items)[1].key | regex_replace('^mlx5_core.sf.(.*)$', '\\1') }}"
+
+# These aux device index numbers are needed for the yaml file to reference the interfaces to attach to
+# Can be set in the role vars
+- name: variable check
+  fail:
+    msg: The Aux device index numbers are not set.
+  when: aux_device_num1 is undefined or aux_device_num2 is undefined
+
+# compile the ips.cdo file from the doca sample apps in /opt/mellanox/doca
+- name: Create /tmp/doca_ips directory
+  file:
+    path: /tmp/doca_ips
+    state: directory
+    mode: '0755'
+
+- name: compile sample suricata signatures
+  command: doca_dpi_compiler -i /opt/mellanox/doca/examples/ips/bin/ips_suricata_rules_example -f suricata -o /tmp/doca_ips/ips.cdo
+  args:
+    creates: /tmp/doca_ips/ips.cdo
+  changed_when: false
+
+# enable hugepages
+- name: Enable 2048k hugepages
+  shell: echo 2048 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+  changed_when: false
+
+# ensure mlx-regex service is started
+- name: Ensure mlx-regex service is started
+  systemd:
+    name: mlx-regex
+    state: started
+
+## Work on the container yaml file for kubelet
+- name: Check if resources are already downloaded
+  command: ngc registry resource info {{ container_resources_path }}
+  register: container_config_info
+  changed_when: false
+
+- name: check version
+  set_fact:
+    container_resources_version: "{{ (container_config_info.stdout|from_json).latestVersionIdStr }}"
+
+- name: Pull container resources files
+  command:
+    cmd: ngc registry resource download-version {{ container_resources_path }}
+    creates: /tmp/doca_container_configs_v{{ container_resources_version }}
+    chdir: /tmp
+  register: container_config_download
+
+- name: Update SF1
+  replace:
+    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version|regex_replace('([1-2].[0-9]).[0-9]', '\\1') }}/doca_ips.yaml"  # noqa 204
+    regexp: 'SF_NUM_1\n.*value: \".*\"\n'
+    replace: 'SF_NUM_1\n        value: "{{ aux_device_num1 }}"\n'
+  # [204] Lines should be no longer than 160 chars
+
+- name: Update SF2
+  replace:
+    path: "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version|regex_replace('([1-2].[0-9]).[0-9]', '\\1') }}/doca_ips.yaml"  # noqa 204
+    regexp: 'SF_NUM_2\n.*value: \".*\"\n'
+    replace: 'SF_NUM_2\n        value: "{{ aux_device_num2 }}"\n'
+  # [204] Lines should be no longer than 160 chars
+
+# copy yaml file to kublet
+- name: Copy yaml file to kubelet.d
+  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/{{ container_resources_version|regex_replace('([1-2].[0-9]).[0-9]', '\1') }}/doca_ips.yaml" /etc/kubelet.d/doca_ips.yaml  # noqa 204
+  changed_when: false
+  # [204] Lines should be no longer than 160 chars
+
+- name: Ensure kubelet is started
+  systemd:
+    name: kubelet
+    state: started

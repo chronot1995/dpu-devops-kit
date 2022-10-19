@@ -1,0 +1,69 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+# Setup 3 VFs on the host
+- name: Setup VFs on the host
+  gather_facts: true
+  hosts: x86
+  become: true
+  roles:
+    - role: create_vfs
+      tags: ['create_vfs']
+      # Set base interface on host to create VFs from
+      physical_function: enp1s0f0np0
+
+- name: Setup All of the containers
+  gather_facts: true
+  hosts: dpus
+  become: true
+  roles:
+    # Make sure NGC CLI is installed and working
+    - role: install_ngc_cli
+      tags: ['install_ngc_cli']
+
+    # Setup containerd authentication to nvcr.io (NGC)
+    - role: ngc_containerd_setup
+      tags: ['ngc_containerd_setup']
+
+    # Deploy DOCA Telemetry Container
+    - role: deploy_doca_telemetry_container
+      tags: ['deploy_doca_telemetry']
+
+    # Deploy DOCA Devel Container
+    - role: deploy_doca_devel_container
+      tags: ['deploy_doca_devel']
+
+    # Deploy DOCA IPS container connected to pf0vf0 and p0
+    - role: deploy_doca_ips_container
+      tags: ['deploy_doca_ips']
+      host_interface: pf0vf0
+
+    # Deploy DOCA AR container connected to pf0vf1 and p0
+    - role: deploy_doca_ar_container
+      tags: ['deploy_doca_ar']
+      host_interface: pf0vf1
+
+    # Deploy DOCA URL container connected to pf0vf0 and p0
+    - role: deploy_doca_url_filter_container
+      tags: ['deploy_doca_url_filter']
+      host_interface: pf0vf2

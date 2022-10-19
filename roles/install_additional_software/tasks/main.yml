@@ -1,0 +1,98 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+- name: Remove NTP Packages
+  apt:
+    name: ['ntpdate', 'ntp']
+    state: absent
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install Common Utilities
+  apt:
+    name:
+      - chrony
+      - fonts-powerline
+      - zsh
+    state: present
+    update_cache: yes
+  register: apt_res
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Set Shell to ZSH
+  shell: 'usermod -s $(which zsh) {{ ansible_user }}'
+  when: not ansible_user_shell == "/usr/bin/zsh" and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Check if Oh My ZSH is installed
+  stat:
+    path: '{{ ansible_env.PWD }}/.oh-my-zsh'
+  register: oh_my_zsh
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Clone Oh My ZSH
+  git:
+    repo: 'https://github.com/ohmyzsh/ohmyzsh.git'
+    dest: '{{ ansible_env.PWD }}/.oh-my-zsh'
+    depth: '1'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Check for p10k theme
+  stat:
+    path: '{{ ansible_env.PWD }}/.oh-my-zsh/custom/themes/powerlevel10k'
+  register: p10k
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install p10k theme
+  git:
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: '{{ ansible_env.PWD }}/.oh-my-zsh/custom/themes/powerlevel10k'
+    version: 'v1.15.0'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Copy dot files
+  copy:
+    src: '{{ item }}'
+    dest: '{{ ansible_env.PWD }}/{{ item }}'
+  with_items:
+    - .p10k.zsh
+    - .zshrc
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Create gitstatus directory
+  file:
+    path: .cache/gitstatus/
+    state: directory
+    mode: '755'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Copy gitstatusd binary
+  copy:
+    src: gitstatusd-linux-{{ ansible_architecture }}
+    dest: .cache/gitstatus/gitstatusd-linux-{{ ansible_architecture }}
+    mode: '755'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Set Time Zone
+  timezone:
+    name: '{{ chrony_timezone }}'
+  notify: restart chrony
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

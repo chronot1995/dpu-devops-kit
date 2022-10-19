@@ -1,0 +1,38 @@
+option domain-name "{{ domain_name }}";
+option domain-name-servers {{ domain_server }};
+
+authoritative;
+log-facility local7;
+
+# A slightly different configuration for an internal subnet.
+subnet {{ dhcp_network | ipaddr('network')}} netmask {{ dhcp_network | ipaddr('netmask')}}  {
+  range {{ dhcp_network.split('.')[0:3] | join('.')}}.100 {{ dhcp_network.split('.')[0:3] | join('.')}}.199;
+  option routers {{ dhcp_network.split('.')[0:3] | join('.')}}.1;
+  option broadcast-address {{ dhcp_network | ipaddr('broadcast')}};
+}
+
+subnet {{ ansible_facts.default_ipv4.network }} netmask {{ ansible_facts.default_ipv4.netmask }} {
+  range {{ ansible_facts.default_ipv4.address }} {{ ansible_facts.default_ipv4.address }};
+  option routers {{ ansible_facts.default_ipv4.gateway }};
+  option broadcast-address {{ ansible_facts.default_ipv4.broadcast }};
+}
+
+host {{ ansible_facts.hostname }} {
+  hardware ethernet {{ ansible_facts.default_ipv4.macaddress }};
+  fixed-address {{ ansible_facts.default_ipv4.address }};
+}
+
+{% for bf in groups['bfoob'] %}
+host {{ bf }}-oob {
+  hardware ethernet {{ hostvars[bf].oob_mac }};
+  fixed-address {{ hostvars[bf].ansible_host }};
+}
+
+{% if hostvars[bf].bmc_mac is defined and hostvars[bf].bmc_ip is defined %}
+host {{ bf }}-bmc {
+  hardware ethernet {{ hostvars[bf].bmc_mac }};
+  fixed-address {{ hostvars[bf].bmc_ip }};
+}
+
+{% endif %}
+{% endfor %}

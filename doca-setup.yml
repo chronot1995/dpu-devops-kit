@@ -1,0 +1,83 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+- hosts: x86_hosts
+  become: yes
+  vars_prompt:
+    - name: 'bfb_prompt'
+      prompt: 'Would you like to install a new BFB on the Bluefield? (Yes/No)'
+      default: 'Yes'
+      private: no
+  roles:
+    - role: precheck
+      tags: ['precheck']
+
+    - role: install_server_doca
+      tags: ['server_doca']
+
+    - role: networking
+      tags: ['networking']
+
+    - role: install_bfb
+      tags: ['install_bfb']
+      when:
+        - bfb_prompt|bool
+
+- hosts: dpus
+  become: yes
+  gather_facts: no
+  roles:
+    - role: dpu_custom_facts
+      tags: ['dpu_custom_facts']
+
+- hosts: dpus
+  become: yes
+  gather_facts: yes
+  roles:
+    - role: reset_dpu_configuration
+      tags: ['reset_dpu_configuration']
+
+    - role: manage_bf2_fw
+      tags: ['manage_bf2_fw']
+
+    # - role: link_type_ethernet
+    #   tags: ['link_type_ethernet']
+
+    - role: networking
+      tags: ['networking']
+
+- hosts: dpus,x86_hosts
+  become: yes
+  roles:
+    - role: install_utility_software
+      tags: ['utility_software']
+
+    # - role: install_additional_software
+    #   tags: ['additional_software']
+
+- hosts: dpus
+  become: yes
+  roles:
+    - role: reboot_os
+      tags: ['reboot_os']
+      when: x86_reboot|default(true)|bool

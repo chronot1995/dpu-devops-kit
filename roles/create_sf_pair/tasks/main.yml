@@ -1,0 +1,303 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+#
+# This role sets up two SF devices based on the host_interface physical function
+# and then plumbs it up into OVS.
+
+##### Setup Two SFs for container
+### Create
+### Configure
+### Deploy
+
+- name: Reset variables
+  set_fact:
+    sf1_exists: false
+    sf2_exists: false
+    sf1_index: ""
+    sf2_index: ""
+    pfnum: ""
+    pci_id: ""
+    aux_interfaces: []
+    aux_interfaces_dict: {}
+    sf1_active_detached: false
+    sf2_active_detached: false
+    physical_interface: ""
+    rep_netdevs: []
+
+- name: Check the host_interface variable
+  fail:
+    msg: The host_interface is not defined. Pass in as role param or set in role vars
+  when: host_interface is undefined
+
+- name: Check the host_interface variable
+  fail:
+    msg: "The provided host_interface: {{ host_interface }} does not exist on the system. pf[0-1]hpf should always exist. Check VFs on host."
+  when: hostvars[inventory_hostname]['ansible_' + host_interface].device is undefined
+
+- name: Check the sf_num variables
+  fail:
+    msg: sf1_num and/or sf2_num variables are not set. Pass them in as role params/vars or set in role vars file
+  when: sf1_num is undefined or sf2_num is undefined
+
+### Create
+# Convenience var. Set to 0 or 1 corresponding to the PF number from the host interface
+- name: set pfnum fact
+  set_fact:
+    pfnum: "{{ host_interface | regex_replace('^pf([0-1]).*', '\\1') | int }}"
+
+# Need to find the pci device (0000:03:00.[0-1]) from the provided host_interface
+# this is used to create SFs from same PCI device. Keeping everything on the same pci/pf device.
+- name: set pci device fact
+  set_fact:
+    pci_id: "{{ hostvars[inventory_hostname]['ansible_' + item].pciid }}"
+  when:
+    - hostvars[inventory_hostname]['ansible_' + item].module is defined
+    - hostvars[inventory_hostname]['ansible_' + item].module == "mlx5_core"
+    - hostvars[inventory_hostname]['ansible_' + item].device == host_interface
+  with_items: "{{ ansible_interfaces }}"
+
+# Collect port show in json format register as variable
+- name: Checking if SFs are created
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port show -j
+  register: sf_check_output
+
+# detect if pfnum + sf1 num is already configured
+- name: SF1 - Detecting if SF1 exists
+  set_fact:
+    sf1_exists: true
+  when:
+    - item["value"].sfnum == sf1_num
+    - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+- name: SF2 - Detecting if SF2 exists
+  set_fact:
+    sf2_exists: true
+  when:
+    - item["value"].sfnum == sf2_num
+    - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# if sf1 doesnt exist, create it
+- name: SF1 - Create SF1
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port add pci/{{ pci_id }} flavour pcisf pfnum {{ pfnum }} sfnum {{ sf1_num }} -j
+  when: not sf1_exists
+
+# if sf2 doesnt exist, create it
+- name: SF2 - Create SF2
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port add pci/{{ pci_id }} flavour pcisf pfnum {{ pfnum }} sfnum {{ sf2_num }} -j
+  when: not sf2_exists
+
+#####
+### Configure
+#####
+# Scrape port info again - SF1 and SF2 should exist in this output, now
+- name: Recollect port states
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port show -j
+  register: sf_check_output
+
+# get SF1 sf index
+- name: SF1 - Get SF1 sf index
+  set_fact:
+    sf1_index: "{{ item['key'] }}"
+  when:
+    - item["value"].sfnum == sf1_num
+    - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# get SF2 sf index
+- name: SF2 - Get SF2 sf index
+  set_fact:
+    sf2_index: "{{ item['key'] }}"
+  when:
+    - item["value"].sfnum == sf2_num
+    - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# if sf1 is inactive and detached, configure it
+- name: SF1 - Configure SF1
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port function set {{ sf1_index }} hw_addr {{ '44:38:39' | random_mac }} trust on state active
+  when:
+    - item["value"]["function"].state == "inactive"
+    - item["value"]["function"].opstate == "detached"
+    - item["key"] == sf1_index
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# if sf2 is inactive and detached, configure it
+- name: SF2 - Configure SF2
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port function set {{ sf2_index }} hw_addr {{ '44:38:39' | random_mac }} trust on state active
+  when:
+    - item["value"]["function"].state == "inactive"
+    - item["value"]["function"].opstate == "detached"
+    - item["key"] == sf2_index
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+#####
+### Deploy
+#####
+## Need to unbind from config driver and bind to mlx5_core driver
+## but only if the opstate is detached and state is active
+#
+# Scrape port info again - SF1 and SF2 should exist in this output and be "active" now
+- name: Recollect port states
+  command: /opt/mellanox/iproute2/sbin/mlxdevm port show -j
+  register: sf_check_output
+
+# Need to find aux devices from the SFs. Only checking the relevant pci device
+- name: Discover all aux devices
+  find:
+    paths: /sys/devices/pci0000:00/0000:00:00.0/0000:01:00.0/0000:02:00.0/{{ pci_id }}
+    pattern: mlx5_core.sf.*
+    file_type: directory
+  register: aux_files
+
+# Build a list of all of the aux devices
+- name: Build list of aux devices
+  set_fact:
+    aux_interfaces: "{{ aux_interfaces|default([]) + [item.path|basename]  }}"
+  with_items: "{{ aux_files['files'] }}"
+
+# Now need to check each aux devices sf number
+- name: Collecting SF numbers for aux devices
+  command: cat /sys/bus/auxiliary/devices/{{ item }}/sfnum
+  with_items: "{{ aux_interfaces }}"
+  register: aux_sf_output
+
+# create a dict of only our SFs that maps aux interface to SF number
+- name: Mapping Aux device to SF
+  set_fact:
+    aux_interfaces_dict: "{{ aux_interfaces_dict|default({}) | combine({item.item: item.stdout})  }}"
+  when:
+    - (item.stdout|int == sf1_num) or (item.stdout|int == sf2_num)
+  with_items: "{{ aux_sf_output['results'] }}"
+
+# if sf1 is active and detached, its ok to unbind/bind. Set fact
+- name: SF1 - Configure SF1
+  set_fact:
+    sf1_active_detached: true
+  when:
+    - item["value"]["function"].state == "active"
+    - item["value"]["function"].opstate == "detached"
+    - item["key"] == sf1_index
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# if sf2 is active and detached, its ok to unbind/bind. Set fact
+- name: SF2 - Configure SF2
+  set_fact:
+    sf2_active_detached: true
+  when:
+    - item["value"]["function"].state == "active"
+    - item["value"]["function"].opstate == "detached"
+    - item["key"] == sf2_index
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# unbind from config driver and bind to real driver
+- name: Unbind from config driver
+  shell: "echo {{ item['key'] }} > /sys/bus/auxiliary/drivers/mlx5_core.sf_cfg/unbind"
+  when:
+   - (item["value"]|int == sf1_num and sf1_active_detached) or (item["value"]|int == sf2_num and sf2_active_detached)
+  failed_when: false
+  with_items: "{{ aux_interfaces_dict|dict2items }}"
+
+- name: Bind to real driver
+  shell: "echo {{ item['key'] }} > /sys/bus/auxiliary/drivers/mlx5_core.sf/bind"
+  when:
+   - (item["value"]|int == sf1_num and sf1_active_detached) or (item["value"]|int == sf2_num and sf2_active_detached)
+  with_items: "{{ aux_interfaces_dict|dict2items }}"
+
+##### End SF creation/config #####
+
+### Plumb up the SFs into OVS
+# Detect physical interface (p0 or p1) based on provided host interface
+- name: discovering physical interface
+  set_fact:
+    physical_interface: "{{ host_interface | regex_replace('^pf([0-1]).*', 'p\\1') }}"
+
+# create a list of the netdevs for SF1 and SF2 - this is what we add to ovs
+- name: Build list of representor netdevs
+  set_fact:
+    rep_netdevs: "{{ rep_netdevs|default([]) + [item['value'].netdev]  }}"
+  when:
+    - item["value"].sfnum == sf1_num or item["value"].sfnum == sf2_num
+    - item["value"].pfnum == (hostvars[inventory_hostname]["pfnum"] | int)
+  with_items: "{{ ((sf_check_output.stdout|from_json).port|dict2items) }}"
+
+# Assume the physical port is already a member of an ovs bridge.
+- name: discover phy interface bridge
+  command: ovs-vsctl port-to-br {{ physical_interface }}
+  register: phy_ovs_bridge_output
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+
+# Discover/set physical interface bridge name
+# need to stick one of the SFs in here
+- name: set physical bridge name fact
+  set_fact:
+    phy_ovs_bridge: "{{ phy_ovs_bridge_output.stdout }}"
+# todo: when: the output is not an error
+
+# create the host bridge
+- name: Create ovs bridge for host interface
+  command: ovs-vsctl add-br {{ host_bridge_name }}-{{ host_interface }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+  when: hostvars[inventory_hostname]['ansible_' + host_bridge_name + '-' + host_interface] is not defined
+
+# remove host interface from whatever bridge its in
+# this is not idempotent.
+- name: Remove host interface from existing bridge
+  command: ovs-vsctl del-port {{ host_interface }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+
+# remove representors from bridges so they don't error if you changed from a host SF to a VF
+- name: Remove host interface from existing bridge
+  command: ovs-vsctl del-port {{ item }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+  with_items: "{{ rep_netdevs }}"
+
+# put host interface in host bridge
+- name: Add host interface to ovs bridge for container
+  command: ovs-vsctl add-port {{ host_bridge_name }}-{{ host_interface }} {{ host_interface }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+
+# put one of the SFs (index 0) into that host-interface bridge
+- name: add SF1 to the host interface bridge
+  command: ovs-vsctl add-port {{ host_bridge_name }}-{{ host_interface }} {{ rep_netdevs[0] }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false
+
+# add the other SF to the bridge with the physical port
+- name: add SF2 to the physical interface bridge
+  command: ovs-vsctl add-port {{ phy_ovs_bridge }} {{ rep_netdevs[1] }}
+  failed_when: false
+  ignore_errors: true
+  changed_when: false

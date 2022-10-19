@@ -1,0 +1,115 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+# We need to check not only the file name, but the file contents. It is possible the user has modified
+# the default networking configuration. In this case we do not want to overwrite it.
+# - name: Check if default Ubuntu Netplan configuration exists on the DPU
+#   copy:
+#     src: 50-mlnx-original.yaml
+#     dest: /etc/netplan/50-mlnx-original.yaml
+#   when:
+#     - ansible_board_name is regex('^BlueField')
+#     - ansible_architecture is regex('^aarch64')
+#     - inventory_hostname in groups['dpus']
+#   register: default_netplan_config_dpu
+#   check_mode: true
+
+# - name: Check if default Ubuntu Netplan configuration exists on the x86 host
+#   copy:
+#     src: 01-network-manager-all.yaml
+#     dest: /etc/netplan/01-network-manager-all.yaml
+#   when:
+#     - ansible_distribution == 'Ubuntu'
+#     - inventory_hostname not in groups['dpus']
+#   register: default_netplan_config_x86
+#   check_mode: true
+
+- name: Configure Network Interfaces on the DPU
+  block:
+    - name: Remove default netplan configuration 1/2 on the DPU
+      file:
+        path: /etc/netplan/50-cloud-init.yaml
+        state: absent
+
+    - name: Remove default netplan configuration 2/2 on the DPU
+      file:
+        path: /etc/netplan/60-mlnx.yaml
+        state: absent
+
+    - name: Apply Bluefield OOB netplan file on the DPU
+      copy:
+        src: 40-oob-bluefield.yaml
+        dest: /etc/netplan/40-oob-bluefield.yaml
+
+    - name: Apply tmfifo netplan file on the DPU
+      template:
+        src: templates/50-cloud-init.j2
+        dest: /etc/netplan/50-cloud-init.yaml
+
+    - name: Apply mlnx netplan file on the DPU
+      copy:
+        src: 60-mlnx-modified.yaml
+        dest: /etc/netplan/60-mlnx.yaml
+      notify: apply netplan
+  when:
+    - ansible_board_name is defined and ansible_board_name is regex('^BlueField')
+    - ansible_architecture is regex('^aarch64')
+    - inventory_hostname in groups['dpus']
+    - ansible_distribution == 'Ubuntu'
+    # - not default_netplan_config_dpu.changed
+
+- name: Configure tmfifo interfaces on Ubuntu
+  block:
+    # - name: Remove default netplan configuration
+    #   file:
+    #     path: /etc/netplan/01-network-manager-all.yaml
+    #     state: absent
+
+    # - name: Apply new default netplan configuration on the x86
+    #   copy:
+    #     src: 10-dhcp-ethernets.yaml
+    #     dest: /etc/netplan/10-dhcp-ethernets.yaml
+
+    - name: Setup rshim IP address on the x86 host (Ubuntu)
+      template:
+        src: templates/20-tmfifo-x86.j2
+        dest: /etc/netplan/20-tmfifo.yaml
+      notify: apply netplan
+  when:
+    # - not default_netplan_config_x86.changed
+    - inventory_hostname in groups['x86_hosts']
+    - ansible_distribution == 'Ubuntu'
+
+- name: Configure tmfifo interfaces on RedHat / Centos
+  block:
+    - name: Setup rshim IP address on the x86 host (RHEL/CentOS)
+      template:
+        src: templates/ifcfg-tmfifo_net0.j2
+        dest: /etc/sysconfig/network-scripts
+      notify: rhel up tmfifo_net0
+  when:
+    - ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS'
+    - inventory_hostname in groups['x86_hosts']
+
+- name: Best Practices
+  meta: flush_handlers

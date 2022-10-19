@@ -1,0 +1,72 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+- name: Install Common Utilities
+  apt:
+    name:
+      - bat
+      - dnsutils
+      - git
+      - htop
+      - lldpd
+      - minicom
+      - sshpass
+      - traceroute
+      - tree
+      - vim
+    state: present
+    update_cache: yes
+  register: apt_res
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install x86 Host Utilities
+  apt:
+    name:
+      - pv
+  when: ansible_architecture == "x86_64" and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Install DPU Host Utilities
+  apt:
+    name:
+      - ctop
+  when: ansible_architecture == "aarch64" and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Set Time Zone
+  timezone:
+    name: '{{ chrony_timezone }}'
+  notify: restart chrony
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Correct LLDP Settings
+  lineinfile:
+    dest: /etc/lldpd.d/port_info.conf
+    line: 'configure lldp portidsubtype ifname'
+    create: yes
+  notify: restart LLDP
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Autostart LLDP
+  service:
+    name: lldpd
+    enabled: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

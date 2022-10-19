@@ -1,0 +1,9 @@
+# Set all ethernet interfaces (starting with "en") to use DHCP
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    alleths:
+      match:
+        name: en*
+      dhcp4: true
