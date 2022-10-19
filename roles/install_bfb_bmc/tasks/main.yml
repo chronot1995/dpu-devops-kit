@@ -37,7 +37,7 @@
 - name: Development BMC Board
   block:
     - name: Board Type Annoucement
-      ansible.builtin.fail:
+      debug:
         msg: 'Install on a Development BMC Board commencing'
 
     # The development BFB and URL variables are stored in the vars/main.yaml file within this role
@@ -117,14 +117,14 @@
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
         minutes: 2
-  when: boardtype == '0x43'
+  when: boardtype == '0x34'
 
 ## Production Board workflow
 
 - name: Production BMC Board
   block:
     - name: Board Type Annoucement
-      ansible.builtin.fail:
+      debug:
         msg: 'Install on a Production BMC Board commencing'
 
     # The development BFB and URL are stored in the group_vars/all.yaml file
