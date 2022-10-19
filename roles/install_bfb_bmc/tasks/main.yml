@@ -117,7 +117,10 @@
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
         minutes: 2
-  when: boardtype == '0x34'
+
+    - meta: end_play
+
+  when: boardtype == '0x44'
 
 ## Production Board workflow
 
@@ -208,4 +211,7 @@
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
         minutes: 2
-  when: boardtype == '0x44'
+
+    - meta: end_play
+
+  when: boardtype == '0x00'
