@@ -46,5 +46,6 @@
     - role: manage_bf2_fw
       tags: ['manage_bf2_fw']
 
-    # - role: install_utility_software
-    #   tags: ['utility_software']
+    - role: reboot_os
+      tags: ['reboot_os_redux']
+      when: x86_reboot|default(true)|bool
