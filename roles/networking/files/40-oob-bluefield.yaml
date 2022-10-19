@@ -1,7 +1,0 @@
-network:
-  ethernets:
-    oob_net0:
-      dhcp4: true
-      dhcp-identifier: mac
-  renderer: NetworkManager
-  version: 2

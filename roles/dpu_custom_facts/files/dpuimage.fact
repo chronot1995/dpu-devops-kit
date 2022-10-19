@@ -1,2 +1,0 @@
-#!/bin/bash
-mlxbf-bootctl | grep -i ^lifecycle | sed 's/^/"/;s/$/"/'

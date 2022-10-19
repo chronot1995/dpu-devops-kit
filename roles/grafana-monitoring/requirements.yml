@@ -1,4 +1,0 @@
-roles:
-  - nleiva.grafana_agent
-collections:
-  - community.general

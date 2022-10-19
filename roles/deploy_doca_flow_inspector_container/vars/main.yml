@@ -1,7 +1,0 @@
-# Required variable - path to container resources on NGC
-container_resources_path: "nvidia/doca/doca_container_configs"
-#
-# This variable is best set as fact in the playbook, but if not can be set here
-# sf_num: 44
-#
-debug_level_log: true

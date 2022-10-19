@@ -1,9 +1,0 @@
-# Set the tmfifo interface IP
-# This interface does not support the use of Network Manager
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    tmfifo_net0:
-      addresses: ["{{ rshim_x86 }}/30"]
-      dhcp4: no

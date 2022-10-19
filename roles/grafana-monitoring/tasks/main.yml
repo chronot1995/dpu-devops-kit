@@ -1,7 +1,0 @@
-- name: Installing Grafana Agent
-  import_role:
-    name: nleiva.grafana_agent
-  vars:
-    prometheus_user: '{{ dpu_prometheus_user }}'
-    grafana_api_key: '{{ dpu_grafana_api_key }}'
-    loki_user: '{{ dpu_loki_user }}'

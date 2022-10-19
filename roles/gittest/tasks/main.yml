@@ -1,0 +1,5 @@
+- name: Pull the Repo
+  ansible.builtin.git:
+    repo: 'https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit'
+    dest: ./
+    update: yes

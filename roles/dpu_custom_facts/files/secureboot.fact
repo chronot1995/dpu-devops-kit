@@ -1,2 +1,0 @@
-#!/bin/bash
-mokutil --sb-state | sed 's/^/"/;s/$/"/'
