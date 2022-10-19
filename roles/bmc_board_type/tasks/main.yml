@@ -31,4 +31,4 @@
 
 # - name: Output of boardtype
 #   debug:
-#     msg: "{{ boardtype.stdout.split(' ')[1] }}"
+#     msg: "{{ board.stdout.split(' ')[1] }}"
