@@ -42,13 +42,13 @@
     name: build_bfb_cfg
   delegate_to: localhost
 
-- name: Add bf.cfg to BFB file
-  shell: cat /tmp/bf.cfg /tmp/{{ doca_bfb }} > /tmp/new.bfb
-  delegate_to: localhost
+# - name: Add bf.cfg to BFB file
+#   shell: cat /tmp/bf.cfg /tmp/{{ doca_bfb }} > /tmp/new.bfb
+#   delegate_to: localhost
 
-- name: Set DOCA bfb file
-  ansible.builtin.set_fact:
-    doca_bfb: new.bfb
+# - name: Set DOCA bfb file
+#   ansible.builtin.set_fact:
+#     doca_bfb: new.bfb
 
 # - name: Fail for debugging
 #   ansible.builtin.fail:
@@ -67,7 +67,7 @@
   # poll: 0
   register: scptobmc
   delegate_to: localhost
-  failed_when: 'truncate.rc != 1'
+  failed_when: 'scptobmc.rc != 1'
 
 # - name: Check on the SCP task
 #   async_status:
