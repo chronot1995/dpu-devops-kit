@@ -21,61 +21,33 @@
 #
 ###############################################################################
 
-# - hosts: x86_hosts
-#   become: yes
-# vars_prompt:
-#   - name: 'bfb_prompt'
-#     prompt: 'Would you like to install a new BFB on the Bluefield? (Yes/No)'
-#     default: 'Yes'
-#     private: no
-# roles:
-# - role: precheck
-#   tags: ['precheck']
-
-# - role: install_server_doca
-#   tags: ['server_doca']
-
-# - role: networking
-#   tags: ['networking']
-
-# - role: install_bfb_bmc
-#   tags: ['install_bfb_bmc']
-# when:
-#   - bfb_prompt|bool
-
 - hosts: dpu_bmcs
   become: yes
   gather_facts: no
+  vars_prompt:
+    - name: 'bfb_prompt'
+      prompt: 'Would you like to install a new BFB on the Bluefield BMC? (Yes/No)'
+      default: 'Yes'
+      private: no
+
   roles:
     - role: install_bfb_bmc
       tags: ['install_bfb_bmc']
-#     - role: dpu_custom_facts
-#       tags: ['dpu_custom_facts']
+  when:
+    - bfb_prompt|bool
 
-# - hosts: dpus
-#   become: yes
-#   gather_facts: yes
-#   roles:
-#     - role: reset_dpu_configuration
-#       tags: ['reset_dpu_configuration']
+- hosts: dpus
+  become: yes
+  gather_facts: yes
+  roles:
+    - role: reset_dpu_configuration
+      tags: ['reset_dpu_configuration']
 
-#     - role: manage_bf2_fw
-#       tags: ['manage_bf2_fw']
+    - role: manage_bf2_fw
+      tags: ['manage_bf2_fw']
 
-#     # - role: link_type_ethernet
-#     #   tags: ['link_type_ethernet']
+    - role: networking
+      tags: ['networking']
 
-#     - role: networking
-#       tags: ['networking']
-
-# - hosts: dpus,x86_hosts
-#   become: yes
-#   roles:
-#     - role: install_utility_software
-#       tags: ['utility_software']
-
-# - hosts: x86_hosts
-#   become: yes
-#   roles:
-#     - role: reboot_os
-#       tags: ['reboot_os']
+    - role: install_utility_software
+      tags: ['utility_software']
