@@ -33,8 +33,8 @@
   roles:
     - role: install_bfb_bmc
       tags: ['install_bfb_bmc']
-  when:
-    - bfb_prompt|bool
+      when:
+        - bfb_prompt|bool
 
 - hosts: dpus
   become: yes
