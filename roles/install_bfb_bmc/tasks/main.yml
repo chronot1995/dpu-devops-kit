@@ -82,9 +82,9 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    # - name: Pause 10 seconds for testing
-    #   pause:
-    #     seconds: 10
+    - name: Pause 10 seconds
+      pause:
+        seconds: 10
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
@@ -162,10 +162,6 @@
           delegate_to: localhost
       when: not newbfbbuilt.stat.exists
 
-    - name: Debug
-      ansible.builtin.fail:
-        msg: 'STOP'
-
     - name: Set DOCA bfb file
       ansible.builtin.set_fact:
         dev_doca_bfb: new.bfb
@@ -176,9 +172,9 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    # - name: Pause 10 seconds for testing
-    #   pause:
-    #     seconds: 10
+    - name: Pause 10 seconds
+      pause:
+        seconds: 10
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
