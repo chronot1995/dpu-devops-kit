@@ -80,6 +80,7 @@
   until: '"started" in verifybmc.state'
   retries: 20
   delay: 30
+  delegate_to: localhost
 
 - name: Remove bf.cfg file
   file:
