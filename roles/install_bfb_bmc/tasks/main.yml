@@ -24,52 +24,52 @@
 ## This pulls in the variables file from the networking role
 ## This is used in the last play to verify the DPU is back online
 
-# - name: Checking if BFB has been downloaded
-#   stat:
-#     path: '/tmp/{{ doca_bfb }}'
-#   register: bfbdownload
-#   delegate_to: localhost
+- name: Checking if BFB has been downloaded
+  stat:
+    path: '/tmp/{{ doca_bfb }}'
+  register: bfbdownload
+  delegate_to: localhost
 
-# - name: Download bfb from the Internet
-#   get_url:
-#     url: '{{ bfb_download_url }}'
-#     dest: '/tmp'
-#   delegate_to: localhost
-#   when: not bfbdownload.stat.exists
+- name: Download bfb from the Internet
+  get_url:
+    url: '{{ bfb_download_url }}'
+    dest: '/tmp'
+  delegate_to: localhost
+  when: not bfbdownload.stat.exists
 
-# - name: Role - build_bfb_cfg
-#   import_role:
-#     name: build_bfb_cfg
-#   delegate_to: localhost
+- name: Role - build_bfb_cfg
+  import_role:
+    name: build_bfb_cfg
+  delegate_to: localhost
 
-# - name: Add bf.cfg to BFB file
-#   shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
-#   delegate_to: localhost
+- name: Add bf.cfg to BFB file
+  shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
+  delegate_to: localhost
 
-# - name: Set DOCA bfb file
-#   ansible.builtin.set_fact:
-#     doca_bfb: new.bfb
+- name: Set DOCA bfb file
+  ansible.builtin.set_fact:
+    doca_bfb: new.bfb
 
-# - name: Stop rshim on the BMC 1/2
-#   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
+- name: Stop rshim on the BMC 1/2
+  ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
 
-# - name: Start rshim on the BMC 2/2
-#   ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
+- name: Start rshim on the BMC 2/2
+  ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-# - name: Pause 10 seconds for testing
-#   pause:
-#     seconds: 10
+- name: Pause 10 seconds for testing
+  pause:
+    seconds: 10
 
-# # This process takes over 20 mins
-# - name: SCP BFB to BMC Rshim
-#   command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-#   register: scptobmc
-#   delegate_to: localhost
-#   failed_when: "'truncate' not in scptobmc.stderr"
+# This process takes over 20 mins
+- name: SCP BFB to BMC Rshim
+  command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
+  register: scptobmc
+  delegate_to: localhost
+  failed_when: "'truncate' not in scptobmc.stderr"
 
-# - name: Pause for 10 minutes - DPU OS Install
-#   pause:
-#     minutes: 10
+- name: Pause for 10 minutes - DPU OS Install
+  pause:
+    minutes: 10
 
 - name: Wait for up to 10 minutes for SSH on the BMC
   ansible.builtin.wait_for:
