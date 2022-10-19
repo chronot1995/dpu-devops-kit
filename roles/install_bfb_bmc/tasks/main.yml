@@ -28,91 +28,97 @@
   import_role:
     name: bmc_board_type
 
-- name: Output of boardtype
-  debug:
-    msg: "{{ board.stdout.split(' ')[1] }}"
-
-- name: Set board
+- name: Set board type from imported role
   ansible.builtin.set_fact:
     boardtype: "{{ board.stdout.split(' ')[1] }}"
 
-- name: Output of boarded
-  debug:
-    msg: '{{ boardtype }}'
+## Development Board workflow
 
-- name: Yeet
-  debug:
-    msg: 'Yeet!'
+- name: Development BMC Board
+  block:
+    # The development BFB and URL are stored in the group_vars/all.yaml file
+    # - name: Checking if BFB has been downloaded
+    #   stat:
+    #     path: '/tmp/{{ dev_doca_bfb }}'
+    #   register: bfbdownload
+    #   delegate_to: localhost
+
+    # - name: Download bfb from the Internet
+    #   get_url:
+    #     url: '{{ dev_bfb_download_url }}'
+    #     dest: '/tmp'
+    #   delegate_to: localhost
+    #   when: not bfbdownload.stat.exists
+
+    - name: Checking if Dev BFB has been created
+      stat:
+        path: '/tmp/dev.bfb'
+      register: devbfbbuilt
+      delegate_to: localhost
+
+    - debug:
+        msg: '{{ devbfbuilt }}'
+
+    - name: Debug
+      ansible.builtin.fail:
+        msg: 'STOP'
+
+    - name: Building the Dev BFB
+      block:
+        - name: Role - build_bfb_cfg
+          import_role:
+            name: build_bfb_cfg
+          delegate_to: localhost
+
+        - name: Add bf.cfg to BFB file
+          shell: cat /tmp/{{ dev_doca_bfb }} /tmp/bf.cfg  > /tmp/dev.bfb
+          delegate_to: localhost
+      when: devbfbuilt.rc == 0
+
+    - name: Set DOCA bfb file
+      ansible.builtin.set_fact:
+        dev_doca_bfb: dev.bfb
+
+    - name: Stop rshim on the BMC 1/2
+      ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
+
+    - name: Start rshim on the BMC 2/2
+      ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
+
+    # - name: Pause 10 seconds for testing
+    #   pause:
+    #     seconds: 10
+
+    # This process takes over 20 mins
+    - name: SCP BFB to BMC Rshim
+      command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ dev_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
+      register: scptobmc
+      delegate_to: localhost
+      failed_when: "'truncate' not in scptobmc.stderr"
+
+    - name: Pause for 10 minutes - DPU OS Install
+      pause:
+        minutes: 10
+
+    - name: Wait for up to 10 minutes for SSH on the BMC
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ ansible_host }}'
+        delay: 10
+      register: verifybmc
+      until: '"started" in verifybmc.state'
+      retries: 20
+      delay: 30
+      delegate_to: localhost
+
+    - name: Remove bf.cfg file
+      file:
+        path: /tmp/bf.cfg
+        state: absent
+      delegate_to: localhost
+
+    - name: Pause for 2 minutes - DPU needs to catch its breath
+      pause:
+        minutes: 2
   when: boardtype == '0x44'
-
-- name: Stop here
-  ansible.builtin.fail:
-    msg: Stop here - debug
-
-- name: Checking if BFB has been downloaded
-  stat:
-    path: '/tmp/{{ doca_bfb }}'
-  register: bfbdownload
-  delegate_to: localhost
-
-- name: Download bfb from the Internet
-  get_url:
-    url: '{{ bfb_download_url }}'
-    dest: '/tmp'
-  delegate_to: localhost
-  when: not bfbdownload.stat.exists
-
-- name: Role - build_bfb_cfg
-  import_role:
-    name: build_bfb_cfg
-  delegate_to: localhost
-
-- name: Add bf.cfg to BFB file
-  shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
-  delegate_to: localhost
-
-- name: Set DOCA bfb file
-  ansible.builtin.set_fact:
-    doca_bfb: new.bfb
-
-- name: Stop rshim on the BMC 1/2
-  ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
-
-- name: Start rshim on the BMC 2/2
-  ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
-
-# - name: Pause 10 seconds for testing
-#   pause:
-#     seconds: 10
-
-# This process takes over 20 mins
-- name: SCP BFB to BMC Rshim
-  command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-  register: scptobmc
-  delegate_to: localhost
-  failed_when: "'truncate' not in scptobmc.stderr"
-
-- name: Pause for 10 minutes - DPU OS Install
-  pause:
-    minutes: 10
-
-- name: Wait for up to 10 minutes for SSH on the BMC
-  ansible.builtin.wait_for:
-    port: 22
-    host: '{{ ansible_host }}'
-    delay: 10
-  register: verifybmc
-  until: '"started" in verifybmc.state'
-  retries: 20
-  delay: 30
-  delegate_to: localhost
-
-- name: Remove bf.cfg file
-  file:
-    path: /tmp/bf.cfg
-    state: absent
-  delegate_to: localhost
-
-- name: Pause for 2 minutes - DPU needs to catch its breath
-  pause:
-    minutes: 2
+## Production Board workflow
