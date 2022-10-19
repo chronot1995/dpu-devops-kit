@@ -57,7 +57,7 @@
       delegate_to: localhost
 
     - debug:
-        msg: '{{ devbfbuilt }}'
+        msg: '{{ devbfbbuilt }}'
 
     - name: Debug
       ansible.builtin.fail:
