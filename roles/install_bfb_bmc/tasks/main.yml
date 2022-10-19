@@ -56,9 +56,9 @@
 - name: Start rshim on the BMC 2/2
   ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-- name: Pause 10 seconds for testing
-  pause:
-    seconds: 10
+# - name: Pause 10 seconds for testing
+#   pause:
+#     seconds: 10
 
 # This process takes over 20 mins
 - name: SCP BFB to BMC Rshim
