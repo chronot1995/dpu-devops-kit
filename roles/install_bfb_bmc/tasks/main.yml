@@ -37,28 +37,28 @@
   delegate_to: localhost
   when: not bfbdownload.stat.exists
 
-# - name: Role - build_bfb_cfg
-#   import_role:
-#     name: build_bfb_cfg
-#   delegate_to: localhost
+- name: Role - build_bfb_cfg
+  import_role:
+    name: build_bfb_cfg
+  delegate_to: localhost
 
-# - name: Add bf.cfg to BFB file
-#   shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
-#   delegate_to: localhost
+- name: Add bf.cfg to BFB file
+  shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
+  delegate_to: localhost
 
-# - name: Set DOCA bfb file
-#   ansible.builtin.set_fact:
-#     doca_bfb: new.bfb
+- name: Set DOCA bfb file
+  ansible.builtin.set_fact:
+    doca_bfb: new.bfb
 
 # - name: Fail for debugging
 #   ansible.builtin.fail:
 #     msg: Quitting yo
 
-# - name: Stop rshim on the BMC 1/2
-#   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
+- name: Stop rshim on the BMC 1/2
+  ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
 
-# - name: Start rshim on the BMC 2/2
-#   ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
+- name: Start rshim on the BMC 2/2
+  ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
 # Take 1 - This process takes 15 mins, at least
 - name: SCP BFB to BMC Rshim
