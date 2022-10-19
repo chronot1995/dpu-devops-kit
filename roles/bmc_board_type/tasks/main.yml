@@ -30,4 +30,4 @@
 
 - name: Output of boardtype
   debug:
-    msg: '{{ boardtype[2] }}'
+    msg: '{{ boardtype.stdout[2] }}'
