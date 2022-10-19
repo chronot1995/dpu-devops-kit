@@ -50,10 +50,6 @@
   ansible.builtin.set_fact:
     doca_bfb: new.bfb
 
-# - name: Fail for debugging
-#   ansible.builtin.fail:
-#     msg: Quitting yo
-
 - name: Stop rshim on the BMC 1/2
   ansible.builtin.raw: /bin/bash -c "systemctl stop rshim"
 
@@ -64,56 +60,32 @@
   pause:
     seconds: 10
 
-# Take 1 - This process takes 15 mins, at least
+# This process takes over 20 mins
 - name: SCP BFB to BMC Rshim
   command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-  # async: 3600
-  # poll: 0
   register: scptobmc
   delegate_to: localhost
-  failed_when: 'scptobmc.rc != 1'
+  failed_when: 'scptobmc.stderr contains "truncate"'
 
-# - name: Check on the SCP task
-#   async_status:
-#     jid: '{{ scptobmc.ansible_job_id }}'
-#   register: job_result
-#   until: job_result.finished
-#   retries: 300
-#   delay: 10
+- name: Pause for 10 minutes - DPU OS Install
+  pause:
+    minutes: 10
 
-# - debug:
-#     msg: '{{ scptobmc }}'
+- name: Wait for up to 10 minutes for SSH on the BMC
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ ansible_host }}'
+    delay: 10
+  register: verifybmc
+  until: '"started" in verifybmc.state'
+  retries: 20
+  delay: 30
 
-# - name: Poll the BMC SSH on the BMC
-#   ansible.builtin.wait_for:
-#     port: 22
-#     host: '{{ ansible_host }}'
-#     delay: 10
-#   register: verifybmc
-
-# - debug:
-#     msg: '{{ verifybmc }}'
-
-# - name: Load bfb into bf2...this will take a while # noqa 305
-#   shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
-#   # [305] Use shell only when shell functionality is required
-#   changed_when: false
-
-# - name: Remove bf.cfg file
-#   file:
-#     path: /tmp/bf.cfg
-#     state: absent
-
-# # this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
-# - name: Ensure ssh config file is in place
-#   template:
-#     src: rshimX.conf.j2
-#     dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
-#     mode: 0644
+- name: Remove bf.cfg file
+  file:
+    path: /tmp/bf.cfg
+    state: absent
 
 - name: Pause for 2 minutes - DPU needs to catch its breath
   pause:
     minutes: 2
-# - name: Role - rshim_check
-#   import_role:
-#     name: rshim_check
