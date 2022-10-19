@@ -57,7 +57,12 @@
       delegate_to: localhost
 
     - debug:
-        msg: '{{ devbfbbuilt }}'
+        msg: 'First attempt'
+      when: devbfbbuilt.stat.exists
+
+    - debug:
+        msg: 'Second attempt'
+      when: not devbfbbuilt.stat.exists
 
     - name: Debug
       ansible.builtin.fail:
