@@ -40,6 +40,11 @@
   debug:
     msg: '{{ boarded }}'
 
+- name: Yeet
+  debug:
+    msg: 'Yeet!'
+  when: boarded == '0x44'
+
 - name: Stop here
   ansible.builtin.fail:
     msg: Stop here - debug
