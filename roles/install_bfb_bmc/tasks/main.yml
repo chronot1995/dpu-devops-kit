@@ -43,7 +43,7 @@
 #   delegate_to: localhost
 
 # - name: Add bf.cfg to BFB file
-#   shell: cat /tmp/bf.cfg /tmp/{{ doca_bfb }} > /tmp/new.bfb
+#   shell: cat /tmp/{{ doca_bfb }} /tmp/bf.cfg  > /tmp/new.bfb
 #   delegate_to: localhost
 
 # - name: Set DOCA bfb file
