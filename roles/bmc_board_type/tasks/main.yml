@@ -26,6 +26,7 @@
 
 - name: Check board type
   ansible.builtin.raw: /bin/bash -c "/usr/sbin/i2ctransfer -y 7 w2@0x55 0x00 0x02 r5"
+  register: boardtype
 # Response of 0x44 is a dev board.
 
 # - name: Output of boardtype

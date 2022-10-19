@@ -27,7 +27,6 @@
 - name: Role - bmc_board_type
   import_role:
     name: bmc_board_type
-  register: boardtype
 
 - name: Output of boardtype
   debug:
