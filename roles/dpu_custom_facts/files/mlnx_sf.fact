@@ -1,0 +1,3 @@
+#!/bin/bash
+mlnx-sf -a show -j
+

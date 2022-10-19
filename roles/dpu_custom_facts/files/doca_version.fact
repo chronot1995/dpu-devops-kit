@@ -1,0 +1,3 @@
+#!/bin/bash
+cat /etc/mlnx-release | sed 's/^/"/;s/$/"/'
+

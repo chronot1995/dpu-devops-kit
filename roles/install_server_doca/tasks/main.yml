@@ -1,0 +1,280 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+# Ubuntu 20.04 and Debian install
+
+- name: Ubuntu and Debian install
+  block:
+    # OFED repo conflicts with DOCA DPDK package
+
+    - name: 'Debian & Ubuntu - Remove OFED Repo'
+      ansible.builtin.apt_repository:
+        repo: deb http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/ubuntu20.04/x86_64
+        state: absent
+
+    - name: 'Debian & Ubuntu - Ensure Universe Repo is configured'
+      ansible.builtin.apt_repository:
+        repo: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe
+        state: present
+
+    # Check for DOCA file presence
+    - name: 'Debian & Ubuntu - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_file }}'
+      register: doca_download_ub
+
+    - name: 'Debian & Ubuntu - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_file }}'
+        dest: '/tmp'
+      when: not doca_download_ub.stat.exists
+
+    # Install DOCA host REPO for Debian and Ubuntu
+    - name: 'Debian & Ubuntu - Install DOCA host repo'
+      apt:
+        deb: /tmp/{{ doca_file }}
+        dpkg_options: 'force-overwrite'
+
+    - name: 'Debian & Ubuntu - Install DOCA components...this may take a while'
+      apt:
+        update_cache: yes
+        name:
+          - doca-sdk
+          - doca-runtime
+          - doca-tools
+  when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version == '20')
+
+## CentOS 8 Stream install
+
+# - name: CentOS 8 install
+#   block:
+#     - name: 'CentOS 8 - Remove OFED Repo'
+#       ansible.builtin.yum_repository:
+#         baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
+#         state: absent
+#         name: 'mlnx_ofed'
+
+#     - name: 'CentOS 8 - Install dnf-plugins-core'
+#       dnf:
+#         name: dnf-plugins-core
+#         state: present
+#         update_cache: yes
+
+#     - name: 'CentOS 8 - Install epel-release'
+#       dnf:
+#         name: epel-release
+#         state: present
+#         update_cache: yes
+
+#     - name: 'CentOS 8 - enable PowerTools' # noqa 305
+#       shell:
+#         cmd: 'dnf config-manager --set-enabled powertools'
+
+#     - name: 'CentOS 8 - Install meson'
+#       dnf:
+#         name: meson
+#         state: present
+
+#     - name: 'CentOS 8 - Checking if DOCA file has been downloaded'
+#       stat:
+#         path: '/tmp/{{ doca_rhel82_file }}'
+#       register: doca_download_rhel
+
+#     - name: 'CentOS 8 - Download x86 DOCA package from the Internet'
+#       get_url:
+#         url: '{{ doca_url }}/{{ doca_rhel82_file }}'
+#         dest: '/tmp'
+#       when: not doca_download_rhel.stat.exists
+
+#     - name: 'CentOS 8 - Install DOCA local repo package for host'
+#       dnf:
+#         name: /tmp/{{ doca_rhel82_file }}
+#         state: present
+#         disable_gpg_check: yes
+
+#     - name: 'CentOS 8 - Update Packages for DOCA dependencies'
+#       dnf:
+#         name: '*'
+#         state: latest
+#         allowerasing: yes
+#         skip_broken: yes
+#         nobest: yes
+
+#     - name: 'CentOS 8 - Install DOCA components...this may take a while'
+#       dnf:
+#         name:
+#           - doca-sdk
+#           - doca-tools
+#           - doca-runtime
+#         state: present
+#         skip_broken: yes
+#         nobest: yes
+
+#   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+
+## CentOS 7 install
+
+- name: CentOS 7 install
+  block:
+    - name: 'CentOS & RHEL - Remove OFED Repo'
+      ansible.builtin.yum_repository:
+        baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
+        state: absent
+        name: 'mlnx_ofed'
+
+    - name: 'CentOS - Install epel-release, uriparser-devel, dnf-command(config-manager)'
+      yum:
+        name:
+          - epel-release
+          - uriparser-devel
+          - dnf-command(config-manager)
+        state: present
+
+    - name: 'CentOS - Install dnf-plugins-core'
+      dnf:
+        name: dnf-plugins-core
+        state: present
+
+    - name: 'CentOS - Install epel-release again'
+      yum:
+        name: epel-release
+        state: present
+
+    - name: 'CentOS - run makecache command' # noqa 305
+      shell:
+        cmd: 'yum makecache'
+
+    - name: 'CentOS - Install meson'
+      yum:
+        name: meson
+        state: present
+
+    - name: 'CentOS & RHEL - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_rhel76_file }}'
+      register: doca_download_rhel
+
+    - name: 'CentOS & RHEL - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_rhel76_file }}'
+        dest: '/tmp'
+      when: not doca_download_rhel.stat.exists
+
+    - name: 'CentOS - Install DOCA local repo package for host'
+      yum:
+        name: /tmp/{{ doca_rhel76_file }}
+        state: present
+        disable_gpg_check: yes
+
+    - name: 'CentOS & RHEL - Install DOCA components...this may take a while'
+      yum:
+        name:
+          - doca-sdk
+          - doca-runtime
+          - doca-tools
+        skip_broken: yes
+        state: present
+
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+
+## RHEL 8 install
+## Activation Key URL: https://access.redhat.com/articles/1378093
+
+- name: RHEL 8 install
+  block:
+    - name: 'RHEL 8 - Remove OFED Repo'
+      ansible.builtin.yum_repository:
+        baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
+        state: absent
+        name: 'mlnx_ofed'
+
+    - name: 'RHEL 8 - Get subscription status'
+      shell:
+        cmd: "subscription-manager status | grep '^Overall Status: ' | awk 'NF>1{print $NF}'"
+      register: rhelsubstatus
+      ignore_errors: true
+
+    - name: 'RHEL 8 - Print subscription status if subscribed'
+      debug:
+        msg: '{{ inventory_hostname }}: {{ rhelsubstatus.stdout }}'
+      when: rhelsubstatus.stdout == "Current"
+
+    - name: 'RHEL 8 - tell user to subscribe system'
+      debug:
+        msg: >
+          {{ inventory_hostname }}: Subscription Status: {{ rhelsubstatus.stdout }} -
+          RHEL is not subscibed - please subscribe system with RedHat using subscription-manager
+      when: rhelsubstatus.stdout != "Current"
+
+    - name: 'RHEL 8 - Add repos needed for RHEL' # noqa 305
+      shell:
+        cmd: 'subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms'
+
+    - name: 'RHEL 8 - epel-release repo'
+      dnf:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        state: present
+        disable_gpg_check: yes
+
+    - name: 'RHEL 8 - Install network-scripts (needed for rshim)'
+      dnf:
+        name: network-scripts
+        state: present
+
+    - name: 'RHEL 8 - Install epel-release, uriparser-devel, dnf-command(config-manager)'
+      yum:
+        name:
+          - epel-release
+          - uriparser-devel
+          - dnf-command(config-manager)
+        state: present
+        update_cache: yes
+
+    - name: 'RHEL 8 - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_rhel82_file }}'
+      register: doca_download_rhel
+
+    - name: 'RHEL 8 - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_rhel82_file }}'
+        dest: '/tmp'
+      when: not doca_download_rhel.stat.exists
+
+    - name: 'RHEL 8 - Install DOCA local repo package for host'
+      yum:
+        name: /tmp/{{ doca_rhel82_file }}
+        state: present
+        disable_gpg_check: yes
+
+    - name: 'RHEL 8 - Install DOCA components...this may take a while'
+      yum:
+        name:
+          - doca-sdk
+          - doca-runtime
+          - doca-tools
+        state: present
+
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
+# Check to see if RHEL host is 'Subscribed' and Install DOCA Repo
+

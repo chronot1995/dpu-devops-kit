@@ -1,0 +1,106 @@
+# check if ngc is configured/setup
+# Check if ngc cli is already installed
+- name: check for ngc cli  # noqa 305
+  command: ngc --version
+  environment:
+    NGC_CLI_FORMAT_TYPE: JSON
+  ignore_errors: True
+  changed_when: false
+  failed_when: false
+  register: ngc_cli_installed_version
+  # [305] Use shell only when shell functionality is required
+
+# maybe implement version checking someday. Doesnt matter for now
+#- name: Check for old ngc version
+#  set_fact:
+#    force_install_ngc_cli: true
+#  when: '(ngc_cli_installed_version is success and (ngc_cli_installed_version.stdout | regex_replace("^.*?([0-9\.]+).*$", "\\1") is version_compare(ngc_cli_version, operator="<")))'
+
+- when: ngc_cli_installed_version.rc != 0 or force_install_ngc_cli
+  block:
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
+    - name: set filename for ngc cli for arm
+      set_fact:
+        ngc_cli_filename: "ngccli_arm64.zip"
+      when: ansible_architecture == "aarch64"
+
+    - name: set filename for ngc cli for x86
+      set_fact:
+        ngc_cli_filename: "ngccli_linux.zip"
+      when: ansible_architecture == "x86_64"
+
+    - name: Checking if ngc zip file is downloaded
+      stat:
+        path: "/tmp/{{ ngc_cli_filename }}"
+      register: ngc_cli_download
+
+    - name: Download ngc cli
+      get_url:
+        url: https://ngc.nvidia.com/downloads/{{ ngc_cli_filename }}
+        dest: "/tmp"
+      when: not ngc_cli_download.stat.exists
+
+    - name: Extract archive to install ngc
+      unarchive:
+        src: "/tmp/{{ ngc_cli_filename }}"
+        dest: /tmp/
+        copy: false
+
+    - name: Copy NGC CLI and deps
+      shell: cp -r /tmp/ngc-cli/* /usr/local/sbin/
+
+# check if ngc is configured/setup
+- name: check if ngc is setup
+  command: ngc diag user
+  ignore_errors: True
+  changed_when: false
+  failed_when: false
+  register: ngc_diag
+
+- when: ngc_diag.stdout is search("Missing API key.")
+  block:
+    - name: Ask for ngc_api_key
+      pause:
+        prompt: "Provide NGC API Key"
+        echo: yes
+      register: ngc_api_key_input
+      when: ngc_api_key is undefined or (ngc_api_key|length < 84)
+
+    - name: Set ngc_api_key fact
+      set_fact:
+         ngc_api_key: "{{ ngc_api_key_input['user_input'] }}"
+      when: ngc_api_key_input['user_input'] is defined
+
+    - name: Ask for ngc_org
+      pause:
+        prompt: "Provide NGC Org"
+        echo: yes
+      register: ngc_org_input
+      when: ngc_org is undefined or (ngc_org|length < 3)
+
+    - name: Set ngc_org fact
+      set_fact:
+        ngc_org: "{{ ngc_org_input['user_input'] }}"
+      when: ngc_org_input['user_input'] is defined
+
+    - name: Force a new configuration
+      set_fact:
+        force_configure_ngc: true
+
+- when: force_configure_ngc
+  block:
+    - name: Create NGC config directory in the user home dir
+      file:
+        path: "/root/.ngc"
+        state: directory
+        mode: '0755'
+
+    - name: Drop NGC CLI config file
+      template:
+        src: ngc_config.j2
+        dest: "/root/.ngc/config"
+        mode: '0600'

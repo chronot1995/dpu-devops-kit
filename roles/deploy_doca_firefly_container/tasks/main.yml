@@ -1,0 +1,158 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+### WARNING: This role only deploys the container from NGC
+## As of April/May DOCA 1.3 release, Firefly is not GA and uses separated host mode
+## Separated host mode must be enabled separately from this role. The DPU DevOps Kit has a role to do this
+
+- name: Check PTP and SYNCE_INTERFACE interfaces exist
+  fail:
+    msg: 'ptp_interface and/or synce_interface do not exist. Check vars and check system/target that the intefaces exist. Set as fact in playbook or set in role vars'
+  when:
+    - hostvars[inventory_hostname]['ansible_' + ptp_interface].device is undefined
+    - hostvars[inventory_hostname]['ansible_' + synce_interface].device is undefined
+
+- name: Detecting if we already have REAL_TIME_CLOCK_ENABLE set
+  shell: mlxconfig -d /dev/mst/mt41686_pciconf0 -e q REAL_TIME_CLOCK_ENABLE | grep "REAL_TIME_CLOCK_ENABLE" | tr -s ' ' | cut -d' ' -f4
+  register: mode_check_output
+
+- when: mode_check_output.stdout == "True(1)"
+  block:
+    - name: Real time clock setting already enabled
+      debug:
+        msg: 'RTC seems to be already set. Skipping'
+
+    - name: Set flag already enabled
+      set_fact:
+        rtc_enabled: true
+
+- when: rtc_enabled is undefined or rtc_enabled is false
+  block:
+    - name: Set REAL_TIME_CLOCK_ENABLE
+      command: "mlxconfig -d {{ hostvars[inventory_hostname]['ansible_' + ptp_interface].pciid }} -y s REAL_TIME_CLOCK_ENABLE=1"
+      register: rtc_set_output
+
+    - name: Set flag for reboot needed
+      set_fact:
+        reboot_needed: true
+
+- name: include_role
+  include_role:
+    name: try_mlxfwreset_warmboot
+  when: reboot_needed is defined and reboot_needed is true
+
+- name: Manual Cold Reboot/Hard Power Cycle needed
+  debug:
+    msg: 'COLD REBOOD NEEDED'
+  when: mlxfwreset_success is false
+
+# check first, then set it?
+# If this fails, its probably because we don't have the mlxconfig settings applied
+# probably need to reboot...
+- name: Detecting if we already have tx_port_ts private flag set
+  shell: ethtool --show-priv-flags {{ ptp_interface }} | grep tx_port_ts | tr -s ' ' | cut -d' ' -f3
+  register: ethtool_priv_flags
+
+- when: ethtool_priv_flags.stdout == 'off'
+  block:
+    # need this to persist. people might need to cold reboot at the end of this
+    - name: Overwrite/create rc.local to enable tx_port_ts
+      template:
+        src: rc.local.j2
+        dest: /etc/rc.local
+        owner: root
+        group: root
+        mode: '0755'
+
+    # may fail if mlxconfig settings aren't set. May need a cold reboot. Just fail and move on
+    - name: Set ethtool config
+      command: 'ethtool --set-priv-flags {{ ptp_interface }} tx_port_ts on'
+      register: ethtool_set_output
+      when: mlxfwreset_success is true or (reboot_needed is undefined or reboot_needed is false)
+      ignore_errors: true
+
+## Work on the container yaml file for kubelet
+- name: Check if resources are already downloaded
+  command: ngc registry resource info {{ container_resources_path }}
+  register: container_config_info
+  changed_when: false
+
+- name: check version
+  set_fact:
+    container_resources_version: '{{ (container_config_info.stdout|from_json).latestVersionIdStr }}'
+
+- name: Pull container resources files
+  command:
+    cmd: ngc registry resource download-version {{ container_resources_path }}
+    creates: /tmp/doca_container_configs_v{{ container_resources_version }}
+    chdir: /tmp
+  register: container_config_download
+
+- name: Update PTP PROFILE
+  replace:
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
+    regexp: 'PROFILE\n.*value: \".*\"\n'
+    replace: 'PROFILE\n          value: "{{ ptp_profile }}"\n'
+  when: ptp_profile is defined
+
+- name: Update PTP_INTERFACE
+  replace:
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
+    regexp: 'PTP_INTERFACE\n.*value: \".*\"\n'
+    replace: 'PTP_INTERFACE\n          value: "{{ ptp_interface }}"\n'
+
+- name: Update SYNCE_INTERFACE
+  replace:
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
+    regexp: 'SYNCE_INTERFACE\n.*value: \".*\"\n'
+    replace: 'SYNCE_INTERFACE\n          value: "{{ synce_interface }}"\n'
+
+- name: Update PTP_CONFIG_FILE
+  replace:
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
+    regexp: 'PTP_CONFIG_FILE\n.*value: \".*\"\n'
+    replace: 'PTP_CONFIG_FILE\n          value: "{{ ptp_config_file }}"\n'
+  when: ptp_config_file is defined
+
+- name: Update SYNCE_CONFIG_FILE
+  replace:
+    path: '/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml'
+    regexp: 'SYNCE_CONFIG_FILE\n.*value: \".*\"\n'
+    replace: 'SYNCE_CONFIG_FILE\n          value: "{{ synce_config_file }}"\n'
+  when: synce_config_file is defined
+
+# copy yaml file to kublet
+- name: Copy yaml file to kubelet.d
+  command: cp "/tmp/doca_container_configs_v{{ container_resources_version }}/configs/latest/doca_firefly.yaml" /etc/kubelet.d/doca_firefly.yaml # noqa 204
+  # [204] Lines should be no longer than 160 chars
+  changed_when: false
+
+- name: Ensure kubelet is started
+  systemd:
+    name: kubelet
+    state: started
+# ptp_interface is ready to use
+#
+# configure ip for the interface:
+#  ifconfig p0 <ip addr> up
+###

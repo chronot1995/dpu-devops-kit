@@ -1,0 +1,71 @@
+###############################################################################
+#
+# Copyright 2020 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+- name: Install mellanox gpg key for Debian / Ubuntu
+  apt_key:
+    url: https://www.mellanox.com/downloads/ofed/RPM-GPG-KEY-Mellanox
+    state: present
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install mellanox apt repo for Debian / Ubuntu
+  apt_repository:
+    repo: "deb http://linux.mellanox.com/public/repo/mlnx_ofed/{{ ofed.version }}/{{ ansible_distribution|lower }}{{ ansible_distribution_version }}/{{ ansible_architecture }} ./"
+    state: present
+    filename: "{{ ofed.repo_name }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install mellanox yum repo for RedHat
+  yum_repository:
+    name: nvidia-ofed
+    description: "Nvidia / Mellanox OFED repo"
+    baseurl: "http://linux.mellanox.com/public/repo/mlnx_ofed/{{ ofed.version }}/rhel{{ ansible_distribution_version }}/{{ ansible_architecture }}/"
+    gpgcheck: yes
+    gpgkey: https://www.mellanox.com/downloads/ofed/RPM-GPG-KEY-Mellanox
+  when: ansible_distribution == 'RedHat'
+
+# Apt downgrades in ansible are tricky since it does not pass the allow-downgrade to python3-apt.
+
+## POC Comment out
+
+# - name: install ofed
+#   apt:
+#     name: "mlnx-ofed-all"
+#     state: absent
+#   when: ofed.downgrade
+
+- name: install ofed for Debian / Ubuntu
+  apt:
+    name: "mlnx-ofed-all"
+    state: latest
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install ofed for RedHat
+  yum:
+    name: "mlnx-ofed-all"
+    state: latest
+  when: ansible_distribution == 'RedHat'
+
+- name: make sure rshim is running after install
+  systemd:
+    state: started
+    name: rshim
+    enabled: yes

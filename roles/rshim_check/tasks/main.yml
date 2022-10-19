@@ -1,0 +1,86 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+
+## This pulls in the variables file from the networking role
+## This is used in the last play to verify the DPU is back online
+
+## rshim_num variable comes from
+
+# - import_role:
+#     name: networking
+
+- name: DPU ipv4 rshim check
+  block:
+    - name: Verify that the DPU's own rshim interface has come online over ipv4
+      wait_for:
+        port: 22
+        delay: 5
+        timeout: 450
+        host: '{{ rshim_dpu }}'
+  when:
+    - inventory_hostname in groups['dpus']
+
+# this ipv6 link local address will always be the same
+# as will tmfifo_net0
+- name: DPU ipv6 rshim check
+  block:
+    - name: Verify that the DPU's own rshim interface has come online over ipv6
+      wait_for:
+        port: 22
+        delay: 5
+        timeout: 450
+        host: 'fe80::21a:caff:feff:ff01%tmfifo_net0'
+  when:
+    - inventory_hostname in groups['dpus']
+
+- name: x86 ipv4 rshim checks
+  block:
+    - name: Verify that the x86's own rshim interface has come online over ipv4
+      wait_for:
+        port: 22
+        delay: 5
+        timeout: 450
+        host: '{{ rshim_x86 }}'
+  when:
+    - inventory_hostname in groups['x86_hosts']
+
+#- name: debug
+#  debug:
+#    msg: "{{ hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['address'] + '%tmfifo_net' + rshim_num }}"
+
+## this checks host depends on the ssh_config.d/rshimX.conf file being dropped by the bfb_install role before
+## this sort of assumes that there is only one ipv6 address and it's the autoassigned link local
+- name: x86 ipv6 rshim checks
+  block:
+    - name: Verify that the x86's own rshim interface has come online over ipv6
+      wait_for:
+        port: 22
+        delay: 5
+        timeout: 30
+        host: "{{ hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['address'] + '%tmfifo_net' + rshim_num }}"
+  when:
+    - inventory_hostname in groups['x86_hosts']
+    - hostvars[inventory_hostname]['ansible_tmfifo_net' + rshim_num]['ipv6'][0]['scope'] == "link"
+
+- name: Best Practices
+  meta: flush_handlers

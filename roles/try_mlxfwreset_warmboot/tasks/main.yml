@@ -1,0 +1,90 @@
+###############################################################################
+#
+# Copyright 2021 NVIDIA Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+###############################################################################
+# This is only intented to run against DPU targets
+#
+#
+# if inventory isn't setup correctly there's no need to detect secure boot
+- when: hostvars[inventory_hostname]['parent_host'] is defined
+  block:
+    - name: Check if secure boot enabled
+      shell: "mokutil --sb-state | grep SecureBoot | awk -F ' ' '{print $2}'"
+      register: secure_boot_output
+
+    - name: Set secure_boot to true if enabled
+      set_fact:
+        secure_boot: true
+      when: secure_boot_output.stdout == "enabled"
+
+# when not in secure boot mode and we have a parent_host set,
+# we can do a mlxfwreset and warm reboots and it will work the same as a cold boot
+- when: secure_boot is false and hostvars[inventory_hostname]['parent_host'] is defined
+  block:
+    - name: mst start on hosts
+      command: mst start
+      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
+
+    - name: mlxfwreset on hosts
+      command: mlxfwreset -d /dev/mst/mt41686_pciconf0 -l 3 -y reset
+      async: 45
+      poll: 0
+      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
+
+    - name: mlxfwreset on dpu
+      command: mlxfwreset -d /dev/mst/mt41686_pciconf0 -l 3 -y reset
+
+    - name: reboot host
+      shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
+
+    - name: reboot dpu        
+      shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+
+    - name: Wait for the DPU reboot before proceeding
+      wait_for_connection:
+        connect_timeout: 10
+        sleep: 5
+        delay: 5
+        timeout: 300
+
+# This doesn't work too well
+#
+#    - name: Restart Host Driver
+#      systemd:
+#        name: openibd
+#        state: restarted
+#      delegate_to: "{{ hostvars[inventory_hostname]['parent_host'] }}"
+
+    - name: Set fact of status
+      set_fact:
+        mlxfwreset_success: true
+
+# Cannot do a mlxfwreset or a BMC power cycle, must be done physically
+- name: Not successful
+  debug:
+    msg: 'Not able to perform the mlxfwreset warm reboot. Secure boot enabled or dpu inventory not setup with parent_host'
+#  when: secure_boot is true or hostvars[inventory_hostname]['parent_host'] is undefined
+  when: mlxfwreset_success is false

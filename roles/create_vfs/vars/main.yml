@@ -1,0 +1,10 @@
+#
+# Number of VFs to create
+num_vfs: 3
+
+# device name to create VFs from
+# ends up being used like this:
+# /sys/class/net/<physical_function>/device/sriov_numvfs
+# if not set, it'll detect mlx5_core interfaces and do it for all of them
+#
+# physical_function: ""
