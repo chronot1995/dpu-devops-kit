@@ -36,7 +36,11 @@
 
 - name: Development BMC Board
   block:
-    # The development BFB and URL are stored in the group_vars/all.yaml file
+    - name: Board Type Annoucement
+      ansible.builtin.fail:
+        msg: 'Install on a Development BMC Board commencing'
+
+    # The development BFB and URL variables are stored in the vars/main.yaml file within this role
     - name: Checking if BFB has been downloaded
       stat:
         path: '/tmp/{{ dev_doca_bfb }}'
@@ -67,10 +71,6 @@
           shell: cat /tmp/{{ dev_doca_bfb }} /tmp/bf.cfg  > /tmp/dev.bfb
           delegate_to: localhost
       when: not devbfbbuilt.stat.exists
-
-    - name: Debug
-      ansible.builtin.fail:
-        msg: 'STOP'
 
     - name: Set DOCA bfb file
       ansible.builtin.set_fact:
@@ -117,12 +117,16 @@
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
         minutes: 2
-  when: boardtype == '0x44'
+  when: boardtype == '0x43'
 
 ## Production Board workflow
 
-- name: Development BMC Board
+- name: Production BMC Board
   block:
+    - name: Board Type Annoucement
+      ansible.builtin.fail:
+        msg: 'Install on a Production BMC Board commencing'
+
     # The development BFB and URL are stored in the group_vars/all.yaml file
     - name: Checking if BFB has been downloaded
       stat:
@@ -137,7 +141,7 @@
       delegate_to: localhost
       when: not bfbdownload.stat.exists
 
-    - name: Checking if Dev BFB has been created
+    - name: Checking if New BFB has been created
       stat:
         path: '/tmp/new.bfb'
       register: newbfbbuilt
