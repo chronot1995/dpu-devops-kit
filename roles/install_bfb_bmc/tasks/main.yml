@@ -30,20 +30,20 @@
 
 - name: Output of boardtype
   debug:
-    msg: "{{ boardtype.stdout.split(' ')[1] }}"
+    msg: "{{ board.stdout.split(' ')[1] }}"
 
-- name: Set DOCA bfb file
+- name: Set board
   ansible.builtin.set_fact:
-    boarded: "{{ boardtype.stdout.split(' ')[1] }}"
+    boardtype: "{{ board.stdout.split(' ')[1] }}"
 
 - name: Output of boarded
   debug:
-    msg: '{{ boarded }}'
+    msg: '{{ boardtype }}'
 
 - name: Yeet
   debug:
     msg: 'Yeet!'
-  when: boarded == '0x44'
+  when: boardtype== '0x44'
 
 - name: Stop here
   ansible.builtin.fail:
