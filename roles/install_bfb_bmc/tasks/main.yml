@@ -95,16 +95,16 @@
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
-        minutes: 10
+        minutes: 1
 
-    - name: Wait for up to 10 minutes for SSH on the BMC
+    - name: Wait for up to 20 minutes for SSH on the BMC
       ansible.builtin.wait_for:
         port: 22
         host: '{{ ansible_host }}'
         delay: 10
       register: verifybmc
-      until: '"started" in verifybmc.state'
-      retries: 20
+      until: '"false" in verifybmc.failed'
+      retries: 40
       delay: 30
       delegate_to: localhost
 
@@ -189,16 +189,16 @@
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
-        minutes: 10
+        minutes: 1
 
-    - name: Wait for up to 10 minutes for SSH on the BMC
+    - name: Wait for up to 20 minutes for SSH on the BMC
       ansible.builtin.wait_for:
         port: 22
         host: '{{ ansible_host }}'
         delay: 10
       register: verifybmc
-      until: '"started" in verifybmc.state'
-      retries: 20
+      until: '"false" in verifybmc.failed'
+      retries: 40
       delay: 30
       delegate_to: localhost
 
