@@ -87,11 +87,11 @@
         seconds: 10
 
     # This process takes over 20 mins
-    # - name: SCP BFB to BMC Rshim
-    #   command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ dev_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
-    #   register: scptobmc
-    #   delegate_to: localhost
-    #   failed_when: "'truncate' not in scptobmc.stderr"
+    - name: SCP BFB to BMC Rshim
+      command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ dev_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
+      register: scptobmc
+      delegate_to: localhost
+      failed_when: "'truncate' not in scptobmc.stderr"
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
@@ -196,7 +196,7 @@
         host: '{{ ansible_host }}'
         delay: 10
       register: verifybmc
-      until: '"false" in verifybmc.failed'
+      until: verifybmc
       retries: 40
       delay: 30
       delegate_to: localhost
