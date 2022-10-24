@@ -110,7 +110,7 @@
 
     - name: Debug var
       debug:
-        msg: '{{ verifybmc }}'
+        msg: '{{ verifybmc.stdout }}'
 
     - name: Remove bf.cfg file
       file:
