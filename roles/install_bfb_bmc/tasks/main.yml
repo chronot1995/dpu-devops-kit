@@ -108,9 +108,8 @@
       # delay: 30
       delegate_to: localhost
 
-    - name: Debug var
-      debug:
-        msg: '{{ verifybmc.stdout }}'
+    - debug:
+        msg: '{{ verifybmc }}'
 
     - name: Remove bf.cfg file
       file:
