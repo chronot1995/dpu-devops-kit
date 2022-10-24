@@ -103,7 +103,7 @@
         host: '{{ ansible_host }}'
         delay: 10
       register: verifybmc
-      until: '"false" in verifybmc.failed'
+      until: '"false" is verifybmc.failed'
       retries: 40
       delay: 30
       delegate_to: localhost
