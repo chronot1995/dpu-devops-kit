@@ -54,7 +54,7 @@
       delegate_to: localhost
       when: not bfbdownload.stat.exists
 
-    - name: Checking if New BFB has been created
+    - name: Checking if new Production BFB has been created
       stat:
         path: '/tmp/new.bfb'
       register: newbfbbuilt
@@ -144,7 +144,7 @@
       delegate_to: localhost
       when: not bfbdownload.stat.exists
 
-    - name: Checking if Dev BFB has been created
+    - name: Checking if new Development BFB has been created
       stat:
         path: '/tmp/dev.bfb'
       register: devbfbbuilt
