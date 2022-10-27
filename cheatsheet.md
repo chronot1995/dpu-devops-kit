@@ -104,6 +104,14 @@ as a sudo user:
 sudo bash -c "echo "SW_RESET 1" > /dev/rshim0/misc"
 ```
 
+7.1 Reset the DPU from the BMC:
+
+```
+echo "DISPLAY_LEVEL 2" > /dev/rshim0/misc
+cat /dev/rshim0/misc
+echo 'SW_RESET 1' > /dev/rshim0/misc
+```
+
 8. Console connection from the x86 / host:
 
 ```
