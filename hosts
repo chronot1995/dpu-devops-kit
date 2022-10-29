@@ -1,3 +1,5 @@
+### ALL / GLOBAL VARIABLES ###
+
 [all:vars]
 ansible_user=ubuntu
 ansible_password=ubuntu
@@ -7,6 +9,20 @@ discovered_interpreter_python="/usr/bin/python3"
 # these must be properly set if you wish to deploy DOCA Service containers from NGC
 ngc_api_key=""
 ngc_org=""
+
+### DPU VARIABLES ###
+
+[dpus]
+# This is the IP address of the DPU OOB management interface.
+# The "dpus" group is required in the PoC Kit
+dpu_oob ansible_host=10.150.106.174 parent_host=x86
+
+[dpus:vars]
+# Uncomment this if the username or password is not "ubuntu"
+# ansible_user=ubuntu
+# ansible_password=ubuntu
+
+### HOST VARIABLES ###
 
 [x86_hosts]
 # This is the IP address of the x86 host containing the DPU
@@ -20,6 +36,8 @@ x86 ansible_host=10.150.170.174
 # ansible_user=nvidia
 # ansible_password=nvidia
 
+### HOST BMC / IDRAC VARIABLES ###
+
 # Uncomment the [x86_host_bmcs] group and vars below in order to use the "reboot_os_redux" role
 
 # [x86_host_bmcs]
@@ -29,20 +47,7 @@ x86 ansible_host=10.150.170.174
 # ansible_user=nvidia
 # ansible_password=nvidia
 
-
-[dpus]
-# This is the IP address of the DPU OOB management interface.
-# The "dpus" group is required in the PoC Kit
-dpu_oob ansible_host=10.150.106.174 parent_host=x86
-
-[dpus:vars]
-# Uncomment this if the username or password is not "ubuntu"
-# ansible_user=ubuntu
-# ansible_password=ubuntu
-
-# Uncomment this line if you are configuring the DHCP Server
-# and provide the MAC address of the DPU OOB Management Interface
-# oob_mac=04:3f:72:d9:fe:d2
+### DPU BMC VARIABLES ###
 
 # Uncomment the [dpu_bmc] group and vars below in order to use the "reboot_os_redux" role
 
@@ -52,6 +57,3 @@ dpu_oob ansible_host=10.150.106.174 parent_host=x86
 # [dpu_bmcs:vars]
 # ansible_user=nvidia
 # ansible_password=nvidia
-
-# [dhcpservers]
-# dhcpserver ansible_host=10.10.145.111

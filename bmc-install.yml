@@ -49,6 +49,6 @@
     - role: manage_bf2_fw
       tags: ['manage_bf2_fw']
 
-    - role: reboot_os_redux
-      tags: ['reboot_os_redux']
+    - role: reboot_os
+      tags: ['reboot_os']
       when: x86_reboot|default(true)|bool

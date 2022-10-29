@@ -20,10 +20,15 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
+---
+# This code does not apply new settings to the DPU
 
-- hosts: dpu_5_bmc
-  become: yes
-  gather_facts: no
-  roles:
-    - role: bmc_board_type
-      tags: ['bmc_board_type']
+# - name: reboot remote os
+#   reboot:
+#     reboot_timeout: "{{ reboot_timeout }}"
+#   when: x86_reboot|default(true)|bool
+
+- name: Manually Cold Boot the x86
+  debug:
+    msg: '**** IMPORTANT: Please cold boot the x86 to apply the DPU settings ****'
+  when: x86_reboot|default(true)|bool

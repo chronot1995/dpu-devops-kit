@@ -6,6 +6,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
 - [DPU DevOps Kit](#dpu-poc-kit)
   - [Quick Start](#quick-start)
   - [Playbook Descriptions](#playbook-descriptions)
+    - [`bmc-install.yml`](#-bmc-install-)
     - [`doca-setup.yml`](#-doca-setupyml-)
     - [`dpdk-setup.yml`](#-dpdk-setupyml-)
     - [`poc-dhcp-server.yml`](#-poc-dhcp-serveryml-)
@@ -28,6 +29,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-reset-ovs.yml`](#-poc-reset-ovs-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
     - [`poc-sshkeys.yml`](#-poc-sshkeys-)
+    - [`poc-test-inventory.yml`](#-poc-test-inventory-)
   - [Using the DevOps Kit](#using-the-poc-kit)
     - [Install and Setup Ansible](#install-and-setup-ansible)
     - [Running the initial playbook](#running-the-initial-playbook)
@@ -281,6 +283,10 @@ More details on each role can be found in their individual README located within
 
 A set of pre-defined `playbooks` are provided in this root directory.
 
+### `bmc-install.yml`
+
+This playbook will install the DOCA image over the BMC rshim on compatible devices. This runs the same playbook as the "doca-setup.yml" file, expect the first tasks pushs the BFB over the BMC rshim
+
 ### `doca-setup.yml`
 
 This is the playbook to get an x86 host and DPU fully ready to run DOCA applications.
@@ -403,6 +409,10 @@ Enables separated mode on the DPU.
 ### 'poc-sshkeys.yml'
 
 Installs the SSH Keys on the DPU and x86 for passwordless authentication
+
+### 'poc-test-inventory.yml'
+
+This will test connectivity to all of the elements in the inventory file
 
 ## Using the DevOps Kit
 
