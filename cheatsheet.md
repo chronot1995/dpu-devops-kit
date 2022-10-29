@@ -31,9 +31,22 @@ systemctl start rshim
 microcom /dev/rshim0/console
 ```
 
-2.2. Exit microcom:
+2.2. Exit microcom on the BMC:
 
 Keystroke: "ctrl + x + a"
+
+2.3 Use microcom on the x86:
+
+```
+systemctl stop rshim
+systemctl start rshim
+microcom -p /dev/rshim0/console
+```
+
+2.4. Exit microcom on the x86:
+
+Keystroke: "ctrl + \"
+"quit" at the prompt
 
 3. View network devices
 
@@ -91,6 +104,14 @@ as a sudo user:
 sudo bash -c "echo "SW_RESET 1" > /dev/rshim0/misc"
 ```
 
+7.1 Reset the DPU from the BMC:
+
+```
+echo "DISPLAY_LEVEL 2" > /dev/rshim0/misc
+cat /dev/rshim0/misc
+echo 'SW_RESET 1' > /dev/rshim0/misc
+```
+
 8. Console connection from the x86 / host:
 
 ```
@@ -125,4 +146,22 @@ git merge origin/main
 ```
 curl --insecure -u root:password https://<idrac IP>/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Slot.5 | jq | grep -i Serial
 "SerialNumber": "MT2150#####"
+```
+
+13. Docker notes:
+
+```
+sudo docker-compose stop
+sudo docker exec -it <container name> /bin/bash
+sudo docker ps
+sudo docker container stats
+sudo docker image ls
+sudo docker image rm <container ID>
+sudo docker stop <container name>
+```
+
+Manually copy a file to a Docker container:
+
+```
+sudo docker cp cumulusmibs4.3/. librenms:/opt/librenms/mibs/cumulus
 ```

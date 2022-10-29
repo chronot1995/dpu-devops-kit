@@ -6,6 +6,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
 - [DPU DevOps Kit](#dpu-poc-kit)
   - [Quick Start](#quick-start)
   - [Playbook Descriptions](#playbook-descriptions)
+    - [`bmc-install.yml`](#-bmc-install-)
     - [`doca-setup.yml`](#-doca-setupyml-)
     - [`dpdk-setup.yml`](#-dpdk-setupyml-)
     - [`poc-dhcp-server.yml`](#-poc-dhcp-serveryml-)
@@ -28,6 +29,7 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
     - [`poc-reset-ovs.yml`](#-poc-reset-ovs-)
     - [`poc-separated-mode.yml`](#-poc-separated-modeyml-)
     - [`poc-sshkeys.yml`](#-poc-sshkeys-)
+    - [`poc-test-inventory.yml`](#-poc-test-inventory-)
   - [Using the DevOps Kit](#using-the-poc-kit)
     - [Install and Setup Ansible](#install-and-setup-ansible)
     - [Running the initial playbook](#running-the-initial-playbook)
@@ -270,7 +272,7 @@ The variables to specify the install locations are the following:
 Here is an example of what the command line would look like for a "signed" image install of DOCA 1.3:
 
 ```
-ansible-playbook doca-setup.yml -e "doca_bfb='DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed.bfb' bfb_download_url='http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed.bfb'"
+ansible-playbook doca-setup.yml -e "doca_bfb='DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb' bfb_download_url='http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'"
 ```
 
 ## Playbook Descriptions
@@ -280,6 +282,10 @@ This collection of playbooks provides the following utilities in the form of [An
 More details on each role can be found in their individual README located within the `roles/` directory.
 
 A set of pre-defined `playbooks` are provided in this root directory.
+
+### `bmc-install.yml`
+
+This playbook will install the DOCA image over the BMC rshim on compatible devices. This runs the same playbook as the "doca-setup.yml" file, expect the first tasks pushs the BFB over the BMC rshim
 
 ### `doca-setup.yml`
 
@@ -403,6 +409,10 @@ Enables separated mode on the DPU.
 ### 'poc-sshkeys.yml'
 
 Installs the SSH Keys on the DPU and x86 for passwordless authentication
+
+### 'poc-test-inventory.yml'
+
+This will test connectivity to all of the elements in the inventory file
 
 ## Using the DevOps Kit
 

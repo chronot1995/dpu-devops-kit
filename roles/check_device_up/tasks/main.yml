@@ -21,36 +21,12 @@
 #
 ###############################################################################
 ---
-- name: x86 with a BMC / iDRAC
-  block:
-    # - name: IPMI Reboot
-    #   debug:
-    #     msg: '**** IMPORTANT: x86 BMC Present ****'
-
-    - name: Cold Reboot of the x86 iDRAC
-      shell: ipmitool -U "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_user'] }}" -P "{{ hostvars[groups['x86_host_bmcs'][0]]['ansible_password'] }}" -H "{{ hostvars[inventory_hostname + '_host_bmc']['ansible_host'] }}" -I lanplus chassis power cycle
-      delegate_to: localhost
-
-    - meta: end_play
-
-  when:
-    - "hostvars[inventory_hostname + '_host_bmc'] is defined"
-    - "groups['x86_host_bmcs'] is defined"
-
-- name: DPU with a BMC
-  block:
-    - name: Cold Reboot of the DPU BMC
-      debug:
-        msg: '**** IMPORTANT: DPU BMC Present. Cold Booting is coming in a future release. For now, please cold boot the x86 to apply the DPU settings ****'
-
-    - meta: end_play
-
-  when:
-    - "hostvars[inventory_hostname + '_bmc'] is defined"
-    - "groups['dpu_bmcs'] is defined"
-
-- name: DPU without a host BMC / iDRAC or DPU BMC
-  block:
-    - name: Manually Cold Boot the x86
-      debug:
-        msg: '**** IMPORTANT: Please cold boot the x86 to apply the DPU settings ****'
+- name: Check Device for up to 20 minutes
+  ansible.builtin.wait_for:
+    port: 22
+    host: '{{ ansible_host }}'
+    delay: 10
+  register: verifystatus
+  until: verifystatus
+  retries: 40
+  delay: 30
