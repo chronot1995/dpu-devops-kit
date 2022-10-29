@@ -1,6 +1,6 @@
 # Release Notes
 
-### 10/30/2022
+### 10/29/2022
 
 1. Added support for installing DOCA over the DPU BMC of compatible cards
 2. Added a new role to identify a production vs development BMC card
