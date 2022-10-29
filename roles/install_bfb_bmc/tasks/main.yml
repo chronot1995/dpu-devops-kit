@@ -95,7 +95,7 @@
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
-        minutes: 1
+        minutes: 10
 
     - name: Role - Check connectivity to BMC
       import_role:
@@ -185,7 +185,7 @@
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
-        minutes: 1
+        minutes: 10
 
     - name: Role - Check connectivity to BMC
       import_role:
