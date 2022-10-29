@@ -62,9 +62,9 @@
 
     - name: Building the Prod BFB
       block:
-        - name: Role - build_bfb_cfg
+        - name: Role - build_bfb_cfg_bmc
           import_role:
-            name: build_bfb_cfg
+            name: build_bfb_cfg_bmc
           delegate_to: localhost
 
         - name: Add bf.cfg to BFB file
@@ -152,9 +152,9 @@
 
     - name: Building the Dev BFB
       block:
-        - name: Role - build_bfb_cfg
+        - name: Role - build_bfb_cfg_bmc
           import_role:
-            name: build_bfb_cfg
+            name: build_bfb_cfg_bmc
           delegate_to: localhost
 
         - name: Add bf.cfg to BFB file

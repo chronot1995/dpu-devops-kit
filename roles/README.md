@@ -5,7 +5,8 @@ Each folder in this directory provides configuration and files to preform DPU or
 Each directory is designed to be a reusable component and does not have any outside dependencies.
 
 - `bmc_board_type` - identifies a production vs development BMC board
-- `build_bfb_cfg` - create the bf.cfg file for the DPU
+- `build_bfb_cfg` - create the bf.cfg file for a DOCA install via the host rshim
+- `build_bfb_cfg_bmc` - create the bf.cfg file for a DOCA install via the DPU's BMC rshim
 - `check_device_up` - check to see if a device is responding before moving onto the next play
 - `create_sf` - create Scalable Functions on the DPU
 - `create_sf_pair` - create Scalable Function pairs on the DPU

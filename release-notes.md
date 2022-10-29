@@ -1,8 +1,14 @@
 # Release Notes
 
-### 10/x/2022
+### 10/30/2022
 
-1. Rewrote the default reboot_os play to let the user know that they will need to cold boot the DPU
+1. Added support for installing DOCA over the DPU BMC of compatible cards
+2. Added a new role to identify a production vs development BMC card
+3. Added a new "build_bfb_cfg_bmc" role to build a pared down bf.cfg for a DOCA install over the BMC's rshim
+4. Added a new "check_device_up" role that can be used for Python and / or non-Python compatible devices by adding the "delegate_to: localhost" for the non-Python compatible devices, such as a DPU's BMC
+5. Moved the legacy "reboot_os" role into the deprecated folder and renamed the "reboot_os_redux" to "reboot_os"
+6. Updated the host file to clearly delinate the sections of the configuration
+7. Updated the roles README file and the project README file
 
 ### 10/4/2022
 
