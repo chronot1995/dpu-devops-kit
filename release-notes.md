@@ -9,7 +9,7 @@
    ii. roles/install_bfb_bmc/vars -> add the updated link to the new DOCA BFB file
    iii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
    iv. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
-4. Build the conditions for
+4. Added the ability to use a development BFB over the host rshim without passing command-line arguments.
 
 ### 10/29/2022
 
