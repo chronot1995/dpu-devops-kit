@@ -1,5 +1,16 @@
 # Release Notes
 
+### 11/7/2022
+
+1. Added DOCA 1.5.0 support
+2. Added support for Ubuntu 22.04 and Rocky 8.6 as a supported host operating system. This will require additional testing around Rocky Linux.
+3. Updated the x86 packages for DOCA 1.5.0. As part of any major or minor release, the following will need to be updated:
+   i. roles/install_bfb/vars -> add the updated link to the new DOCA BFB file
+   ii. roles/install_bfb_bmc/vars -> add the updated link to the new DOCA BFB file
+   iii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
+   iv. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
+4. Build the conditions for
+
 ### 10/29/2022
 
 1. Added support for installing DOCA over the DPU BMC of compatible cards

@@ -21,9 +21,9 @@
 #
 ###############################################################################
 
-# Ubuntu 20.04 and Debian install
+# Ubuntu 20.04 host install
 
-- name: Ubuntu and Debian install
+- name: Ubuntu 20.04 host install
   block:
     # OFED repo conflicts with DOCA DPDK package
 
@@ -62,75 +62,169 @@
           - doca-sdk
           - doca-runtime
           - doca-tools
-  when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version == '20')
+  when: ansible_distribution == (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '20.04')
 
-## CentOS 8 Stream install
+# Ubuntu 22.04 host install
 
-# - name: CentOS 8 install
-#   block:
-#     - name: 'CentOS 8 - Remove OFED Repo'
-#       ansible.builtin.yum_repository:
-#         baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
-#         state: absent
-#         name: 'mlnx_ofed'
+- name: Ubuntu 22.04 and Debian install
+  block:
+    # OFED repo conflicts with DOCA DPDK package
 
-#     - name: 'CentOS 8 - Install dnf-plugins-core'
-#       dnf:
-#         name: dnf-plugins-core
-#         state: present
-#         update_cache: yes
+    - name: 'Debian & Ubuntu - Remove OFED Repo'
+      ansible.builtin.apt_repository:
+        repo: deb http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/ubuntu20.04/x86_64
+        state: absent
 
-#     - name: 'CentOS 8 - Install epel-release'
-#       dnf:
-#         name: epel-release
-#         state: present
-#         update_cache: yes
+    - name: 'Debian & Ubuntu - Ensure Universe Repo is configured'
+      ansible.builtin.apt_repository:
+        repo: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe
+        state: present
 
-#     - name: 'CentOS 8 - enable PowerTools' # noqa 305
-#       shell:
-#         cmd: 'dnf config-manager --set-enabled powertools'
+    # Check for DOCA file presence
+    - name: 'Debian & Ubuntu - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_ubuntu2204_file }}'
+      register: doca_download_ub
 
-#     - name: 'CentOS 8 - Install meson'
-#       dnf:
-#         name: meson
-#         state: present
+    - name: 'Debian & Ubuntu - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_ubuntu2204_file }}'
+        dest: '/tmp'
+      when: not doca_download_ub.stat.exists
 
-#     - name: 'CentOS 8 - Checking if DOCA file has been downloaded'
-#       stat:
-#         path: '/tmp/{{ doca_rhel82_file }}'
-#       register: doca_download_rhel
+    # Install DOCA host REPO for Debian and Ubuntu
+    - name: 'Debian & Ubuntu - Install DOCA host repo'
+      apt:
+        deb: /tmp/{{ doca_ubuntu2204_file }}
+        dpkg_options: 'force-overwrite'
 
-#     - name: 'CentOS 8 - Download x86 DOCA package from the Internet'
-#       get_url:
-#         url: '{{ doca_url }}/{{ doca_rhel82_file }}'
-#         dest: '/tmp'
-#       when: not doca_download_rhel.stat.exists
+    - name: 'Debian & Ubuntu - Install DOCA components...this may take a while'
+      apt:
+        update_cache: yes
+        name:
+          - doca-sdk
+          - doca-runtime
+          - doca-tools
 
-#     - name: 'CentOS 8 - Install DOCA local repo package for host'
-#       dnf:
-#         name: /tmp/{{ doca_rhel82_file }}
-#         state: present
-#         disable_gpg_check: yes
+    - meta: end_play
 
-#     - name: 'CentOS 8 - Update Packages for DOCA dependencies'
-#       dnf:
-#         name: '*'
-#         state: latest
-#         allowerasing: yes
-#         skip_broken: yes
-#         nobest: yes
+  when: ansible_distribution == (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04')
 
-#     - name: 'CentOS 8 - Install DOCA components...this may take a while'
-#       dnf:
-#         name:
-#           - doca-sdk
-#           - doca-tools
-#           - doca-runtime
-#         state: present
-#         skip_broken: yes
-#         nobest: yes
+# Debian 10.8 host install
 
-#   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+- name: Debian 10.8 host install
+  block:
+    # OFED repo conflicts with DOCA DPDK package
+
+    - name: 'Debian - Remove OFED Repo'
+      ansible.builtin.apt_repository:
+        repo: deb http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/ubuntu20.04/x86_64
+        state: absent
+
+    - name: 'Debian - Ensure Universe Repo is configured'
+      ansible.builtin.apt_repository:
+        repo: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe
+        state: present
+
+    # Check for DOCA file presence
+    - name: 'Debian - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_debian108_file }}'
+      register: doca_download_ub
+
+    - name: 'Debian - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_debian108_file }}'
+        dest: '/tmp'
+      when: not doca_download_ub.stat.exists
+
+    # Install DOCA host REPO for Debian and Ubuntu
+    - name: 'Debian - Install DOCA host repo'
+      apt:
+        deb: /tmp/{{ doca_debian108_file }}
+        dpkg_options: 'force-overwrite'
+
+    - name: 'Debian & Ubuntu - Install DOCA components...this may take a while'
+      apt:
+        update_cache: yes
+        name:
+          - doca-sdk
+          - doca-runtime
+          - doca-tools
+
+    - meta: end_play
+
+  when: ansible_distribution == (ansible_distribution == 'Debian' and ansible_distribution_major_version == '10' and ansible_distribution_version >= '10.8')
+
+## Rocky 8.6 install
+
+- name: Rocky 8.6 install
+  block:
+    - name: 'Rocky 8 - Remove OFED Repo'
+      ansible.builtin.yum_repository:
+        baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
+        state: absent
+        name: 'mlnx_ofed'
+
+    - name: 'Rocky 8 - Install dnf-plugins-core'
+      dnf:
+        name: dnf-plugins-core
+        state: present
+        update_cache: yes
+
+    - name: 'Rocky 8 - Install epel-release'
+      dnf:
+        name: epel-release
+        state: present
+        update_cache: yes
+
+    - name: 'Rocky 8 - enable PowerTools' # noqa 305
+      shell:
+        cmd: 'dnf config-manager --set-enabled powertools'
+
+    - name: 'Rocky 8 - Install meson'
+      dnf:
+        name: meson
+        state: present
+
+    - name: 'Rocky 8 - Checking if DOCA file has been downloaded'
+      stat:
+        path: '/tmp/{{ doca_rocky86_file }}'
+      register: doca_download_rhel
+
+    - name: 'Rocky 8 - Download x86 DOCA package from the Internet'
+      get_url:
+        url: '{{ doca_url }}/{{ doca_rocky86_file }}'
+        dest: '/tmp'
+      when: not doca_download_rhel.stat.exists
+
+    - name: 'Rocky 8 - Install DOCA local repo package for host'
+      dnf:
+        name: /tmp/{{ doca_rocky86_file }}
+        state: present
+        disable_gpg_check: yes
+
+    - name: 'Rocky 8 - Update Packages for DOCA dependencies'
+      dnf:
+        name: '*'
+        state: latest
+        allowerasing: yes
+        skip_broken: yes
+        nobest: yes
+
+    - name: 'Rocky 8 - Install DOCA components...this may take a while'
+      dnf:
+        name:
+          - doca-sdk
+          - doca-tools
+          - doca-runtime
+        state: present
+        skip_broken: yes
+        nobest: yes
+
+    - meta: end_play
+
+  when: ansible_distribution == 'Rocky' and ansible_distribution_major_version == '8'
 
 ## CentOS 7 install
 
@@ -194,6 +288,8 @@
           - doca-tools
         skip_broken: yes
         state: present
+
+    - meta: end_play
 
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
 
@@ -274,6 +370,8 @@
           - doca-runtime
           - doca-tools
         state: present
+
+    - meta: end_play
 
   when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
 # Check to see if RHEL host is 'Subscribed' and Install DOCA Repo

@@ -48,15 +48,18 @@ management of [NVIDIA BlueField-2 DPUs](https://nvda.ws/3rMFfMM).
 
 ## Supported DPU + x86 / host platforms
 
-The DevOps Kit has been tested on the following DPU platforms:
+The DevOps Kit has installed the following operating systems on the DPU:
 
-1. Ubuntu 20.04 (DOCA 1.1.x - 1.3.x)
+1. Ubuntu 20.04 (DOCA 1.1.x - 1.5.x)
 
 The DevOps Kit has been tested on the following x86 / host platforms:
 
-1. Ubuntu 20.04 (DOCA 1.1.x - 1.3.x)
-2. Centos 7.9.x (DOCA 1.2.x)
-3. Red Hat Enterprise 8.2 (DOCA 1.2.x)
+1. Ubuntu 20.04 (DOCA 1.1.x - 1.5.x)
+2. Ubuntu 22.04 (DOCA 1.5.x)
+3. Debian 10.8 (DOCA 1.5.x)
+4. Red Hat Enterprise 8.2 (DOCA 1.2.x)
+5. Rocky Linux 8.6 (DOCA 1.5)
+6. Centos 7.9.x (DOCA 1.2.x)
 
 ## Automation Container
 

@@ -20,9 +20,17 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-# DOCA 1.4.0 / BFB 3.9.2:
-doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'
+# DOCA 1.5.0 / BFB 3.9.3:
+# Production / Signed Image:
+doca_bfb: 'doca_1.5.0_bsp_3.9.3_ubuntu_20.04-11.signed.bfb'
 bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
-
-dev_doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.bfb'
+# Development / Unsigned Image:
+dev_doca_bfb: 'doca_1.5.0_bsp_3.9.3_ubuntu_20.04-11.bfb'
 dev_bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}'
+# DOCA 1.4.0 / BFB 3.9.2:
+# Production / Signed Image:
+# doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'
+# bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
+# Development / Unsigned Image:
+# dev_doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.bfb'
+# dev_bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}'
