@@ -27,78 +27,79 @@
   block:
     # OFED repo conflicts with DOCA DPDK package
 
-    - name: 'Debian & Ubuntu - Remove OFED Repo'
+    - name: 'Ubuntu 20.04 - Remove OFED Repo'
       ansible.builtin.apt_repository:
         repo: deb http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/ubuntu20.04/x86_64
         state: absent
 
-    - name: 'Debian & Ubuntu - Ensure Universe Repo is configured'
+    - name: 'Ubuntu 20.04 - Ensure Universe Repo is configured'
       ansible.builtin.apt_repository:
         repo: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe
         state: present
 
     # Check for DOCA file presence
-    - name: 'Debian & Ubuntu - Checking if DOCA file has been downloaded'
+    - name: 'Ubuntu 20.04 - Checking if DOCA file has been downloaded'
       stat:
         path: '/tmp/{{ doca_file }}'
       register: doca_download_ub
 
-    - name: 'Debian & Ubuntu - Download x86 DOCA package from the Internet'
+    - name: 'Ubuntu 20.04 - Download x86 DOCA package from the Internet'
       get_url:
         url: '{{ doca_url }}/{{ doca_file }}'
         dest: '/tmp'
       when: not doca_download_ub.stat.exists
 
-    # Install DOCA host REPO for Debian and Ubuntu
-    - name: 'Debian & Ubuntu - Install DOCA host repo'
+    # Install DOCA host REPO for Ubuntu 20.04
+    - name: 'Ubuntu 20.04 - Install DOCA host repo'
       apt:
         deb: /tmp/{{ doca_file }}
         dpkg_options: 'force-overwrite'
 
-    - name: 'Debian & Ubuntu - Install DOCA components...this may take a while'
+    - name: 'Ubuntu 20.04 - Install DOCA components...this may take a while'
       apt:
         update_cache: yes
         name:
           - doca-sdk
           - doca-runtime
           - doca-tools
-  when: ansible_distribution == (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '20.04')
+  when:
+    - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '20.04'
 
 # Ubuntu 22.04 host install
 
-- name: Ubuntu 22.04 and Debian install
+- name: Ubuntu 22.04 install
   block:
     # OFED repo conflicts with DOCA DPDK package
 
-    - name: 'Debian & Ubuntu - Remove OFED Repo'
+    - name: 'Ubuntu 22.04 - Remove OFED Repo'
       ansible.builtin.apt_repository:
         repo: deb http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/ubuntu20.04/x86_64
         state: absent
 
-    - name: 'Debian & Ubuntu - Ensure Universe Repo is configured'
+    - name: 'Ubuntu 22.04 - Ensure Universe Repo is configured'
       ansible.builtin.apt_repository:
         repo: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe
         state: present
 
     # Check for DOCA file presence
-    - name: 'Debian & Ubuntu - Checking if DOCA file has been downloaded'
+    - name: 'Ubuntu 22.04 - Checking if DOCA file has been downloaded'
       stat:
         path: '/tmp/{{ doca_ubuntu2204_file }}'
       register: doca_download_ub
 
-    - name: 'Debian & Ubuntu - Download x86 DOCA package from the Internet'
+    - name: 'Ubuntu 22.04 - Download x86 DOCA package from the Internet'
       get_url:
         url: '{{ doca_url }}/{{ doca_ubuntu2204_file }}'
         dest: '/tmp'
       when: not doca_download_ub.stat.exists
 
-    # Install DOCA host REPO for Debian and Ubuntu
-    - name: 'Debian & Ubuntu - Install DOCA host repo'
+    # Install DOCA host REPO for Ubuntu 22.04
+    - name: 'Ubuntu 22.04 - Install DOCA host repo'
       apt:
         deb: /tmp/{{ doca_ubuntu2204_file }}
         dpkg_options: 'force-overwrite'
 
-    - name: 'Debian & Ubuntu - Install DOCA components...this may take a while'
+    - name: 'Ubuntu 22.04 - Install DOCA components...this may take a while'
       apt:
         update_cache: yes
         name:
@@ -108,7 +109,8 @@
 
     - meta: end_play
 
-  when: ansible_distribution == (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04')
+  when:
+    - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'
 
 # Debian 10.8 host install
 
@@ -138,7 +140,7 @@
         dest: '/tmp'
       when: not doca_download_ub.stat.exists
 
-    # Install DOCA host REPO for Debian and Ubuntu
+    # Install DOCA host REPO for Debian 10.8
     - name: 'Debian - Install DOCA host repo'
       apt:
         deb: /tmp/{{ doca_debian108_file }}
@@ -154,7 +156,8 @@
 
     - meta: end_play
 
-  when: ansible_distribution == (ansible_distribution == 'Debian' and ansible_distribution_major_version == '10' and ansible_distribution_version >= '10.8')
+  when:
+    - ansible_distribution == 'Debian' and ansible_distribution_version >= '10.8'
 
 ## Rocky 8.6 install
 
@@ -224,19 +227,20 @@
 
     - meta: end_play
 
-  when: ansible_distribution == 'Rocky' and ansible_distribution_major_version == '8'
+  when:
+    - ansible_distribution == 'Rocky' and ansible_distribution_major_version == '8'
 
 ## CentOS 7 install
 
 - name: CentOS 7 install
   block:
-    - name: 'CentOS & RHEL - Remove OFED Repo'
+    - name: 'CentOS 7 - Remove OFED Repo'
       ansible.builtin.yum_repository:
         baseurl: http://linux.mellanox.com/public/repo/mlnx_ofed/5.4-1.0.3.0/rhel8.4/x86_64/
         state: absent
         name: 'mlnx_ofed'
 
-    - name: 'CentOS - Install epel-release, uriparser-devel, dnf-command(config-manager)'
+    - name: 'CentOS 7 - Install epel-release, uriparser-devel, dnf-command(config-manager)'
       yum:
         name:
           - epel-release
@@ -244,7 +248,7 @@
           - dnf-command(config-manager)
         state: present
 
-    - name: 'CentOS - Install dnf-plugins-core'
+    - name: 'CentOS 7 - Install dnf-plugins-core'
       dnf:
         name: dnf-plugins-core
         state: present
@@ -254,33 +258,33 @@
         name: epel-release
         state: present
 
-    - name: 'CentOS - run makecache command' # noqa 305
+    - name: 'CentOS 7 - run makecache command' # noqa 305
       shell:
         cmd: 'yum makecache'
 
-    - name: 'CentOS - Install meson'
+    - name: 'CentOS 7 - Install meson'
       yum:
         name: meson
         state: present
 
-    - name: 'CentOS & RHEL - Checking if DOCA file has been downloaded'
+    - name: 'CentOS 7 - Checking if DOCA file has been downloaded'
       stat:
         path: '/tmp/{{ doca_rhel76_file }}'
       register: doca_download_rhel
 
-    - name: 'CentOS & RHEL - Download x86 DOCA package from the Internet'
+    - name: 'CentOS 7 - Download x86 DOCA package from the Internet'
       get_url:
         url: '{{ doca_url }}/{{ doca_rhel76_file }}'
         dest: '/tmp'
       when: not doca_download_rhel.stat.exists
 
-    - name: 'CentOS - Install DOCA local repo package for host'
+    - name: 'CentOS 7 - Install DOCA local repo package for host'
       yum:
         name: /tmp/{{ doca_rhel76_file }}
         state: present
         disable_gpg_check: yes
 
-    - name: 'CentOS & RHEL - Install DOCA components...this may take a while'
+    - name: 'CentOS 7 - Install DOCA components...this may take a while'
       yum:
         name:
           - doca-sdk
@@ -291,7 +295,8 @@
 
     - meta: end_play
 
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+  when:
+    - ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
 
 ## RHEL 8 install
 ## Activation Key URL: https://access.redhat.com/articles/1378093
@@ -373,6 +378,7 @@
 
     - meta: end_play
 
-  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
+  when:
+    - ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
 # Check to see if RHEL host is 'Subscribed' and Install DOCA Repo
 

@@ -47,6 +47,9 @@
   become: yes
   gather_facts: no
   roles:
+    - role: check_device_up
+      tags: ['check_device_up']
+
     - role: dpu_custom_facts
       tags: ['dpu_custom_facts']
 

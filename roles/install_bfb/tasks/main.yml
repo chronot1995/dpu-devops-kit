@@ -39,6 +39,16 @@
   import_role:
     name: build_bfb_cfg
 
+- name: Stop rshim, if running
+  ansible.builtin.systemd:
+    name: rshim
+    state: stopped
+
+- name: Start rshim, if running
+  ansible.builtin.systemd:
+    name: rshim
+    state: started
+
 - name: Load bfb into bf2...this will take a while # noqa 305
   shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
   # [305] Use shell only when shell functionality is required

@@ -22,10 +22,10 @@
 ###############################################################################
 # DOCA 1.5.0 / BFB 3.9.3:
 # Production / Signed Image:
-doca_bfb: 'doca_1.5.0_bsp_3.9.3_ubuntu_20.04-11.signed.bfb'
+doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.signed.bfb'
 bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
 # Development / Unsigned Image:
-dev_doca_bfb: 'doca_1.5.0_bsp_3.9.3_ubuntu_20.04-11.bfb'
+dev_doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.bfb'
 dev_bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}'
 # DOCA 1.4.0 / BFB 3.9.2:
 # Production / Signed Image:
