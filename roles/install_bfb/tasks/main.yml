@@ -21,9 +21,6 @@
 #
 ###############################################################################
 
-## This pulls in the variables file from the networking role
-## This is used in the last play to verify the DPU is back online
-
 - name: Checking if BFB has been downloaded
   stat:
     path: '/tmp/{{ doca_bfb }}'
@@ -48,6 +45,10 @@
   ansible.builtin.systemd:
     name: rshim
     state: started
+
+- name: Pause 30 seconds for rshim
+  pause:
+    seconds: 30
 
 - name: Load bfb into bf2...this will take a while # noqa 305
   shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'

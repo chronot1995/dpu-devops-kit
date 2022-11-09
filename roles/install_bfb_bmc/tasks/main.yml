@@ -21,8 +21,8 @@
 #
 ###############################################################################
 
-## This pulls in the variables file from the networking role
-## This is used in the last play to verify the DPU is back online
+# This will pull in the variables file from the install_bfb role
+# rather than have two different var files which could get out of sync
 
 - name: Role - bmc_board_type
   import_role:
@@ -40,7 +40,6 @@
       debug:
         msg: 'Install on a Production BMC Board commencing'
 
-    # The development BFB and URL are stored in the group_vars/all.yaml file
     - name: Checking if BFB has been downloaded
       stat:
         path: '/tmp/{{ doca_bfb }}'
@@ -82,9 +81,9 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    - name: Pause 10 seconds
+    - name: Pause 30 seconds for rshim
       pause:
-        seconds: 10
+        seconds: 30
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
