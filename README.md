@@ -245,7 +245,7 @@ dpu_oob | SUCCESS => {
 
 Other examples from tools such as Podman are welcome
 
-## Installing Unsigned / Developer Images
+## Installing Unsigned / Development Images
 
 Some of the Bluefield-2 cards have "unsigned" or development images that are available to internal NVIDIA resources. Currently, the only way to view if the card is a signed or unsigned / development card is to run the following command from the DPU:
 
@@ -267,7 +267,7 @@ or
 lifecycle state: Secured (development)
 ```
 
-The variables to specify the install locations are the following:
+There are two ways to configure DOCA via the DevOps Kit. First, these variables will specify the install locations:
 
 `doca_bfb` - the file name of the DOCA image
 `bfb_download_url` - the combination of the development URL and the filename
@@ -277,6 +277,14 @@ Here is an example of what the command line would look like for a "signed" image
 ```
 ansible-playbook doca-setup.yml -e "doca_bfb='DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb' bfb_download_url='http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'"
 ```
+
+Second, you can add the following to the x86 inventory item:
+
+`board=dev`
+
+The URL and file name for the development BFB and URL are defined in the following location:
+
+group_vars > all > main.yml
 
 ## Playbook Descriptions
 

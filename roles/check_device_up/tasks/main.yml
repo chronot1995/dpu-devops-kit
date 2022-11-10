@@ -21,12 +21,17 @@
 #
 ###############################################################################
 ---
-- name: Check Device for up to 20 minutes
-  ansible.builtin.wait_for:
-    port: 22
-    host: '{{ ansible_host }}'
-    delay: 10
-  register: verifystatus
-  until: verifystatus
-  retries: 40
-  delay: 30
+# - name: Check Device for up to 20 minutes
+#   ansible.builtin.wait_for:
+#     port: 22
+#     host: '{{ ansible_host }}'
+#     delay: 10
+#   register: verifystatus
+#   until: verifystatus
+#   retries: 40
+#   delay: 30
+
+- name: Check for 10 mins, 1 min delay
+  ansible.builtin.wait_for_connection:
+    delay: 60
+    timeout: 600

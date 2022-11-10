@@ -76,6 +76,7 @@
     - ansible_architecture is regex('^aarch64')
     - inventory_hostname in groups['dpus']
     - ansible_distribution == 'Ubuntu'
+    - sfcenabled is not defined
     # - not default_netplan_config_dpu.changed
 
 - name: Configure tmfifo interfaces on Ubuntu

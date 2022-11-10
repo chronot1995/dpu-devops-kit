@@ -30,6 +30,8 @@ dpu_oob ansible_host=10.150.106.174
 [x86_hosts]
 x86 ansible_host=10.150.170.174
 
+# Adding "board=dev" to the end of an x86 host will install a development version of DOCA to the DPU
+
 # This is the IP address of the x86 host containing the DPU
 # This IP should be set to be something you can SSH to from the machine running Ansible
 # or if you are running Ansible directly on the host, 127.0.0.1

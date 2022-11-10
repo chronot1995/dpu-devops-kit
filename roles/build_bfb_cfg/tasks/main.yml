@@ -32,8 +32,18 @@
 #     dest: /tmp/network-config
 #     mode: 0755
 
+- name: Build bf.cfg for HBN with SFC from the template
+  template:
+    src: bf-sfc.j2
+    dest: /tmp/bf.cfg
+    mode: 0755
+  when:
+    - sfcenabled is defined
+    - sfcenabled is true
+
 - name: Build bf.cfg file from the template
   template:
     src: bf.j2
     dest: /tmp/bf.cfg
     mode: 0755
+  when: sfcenabled is not defined
