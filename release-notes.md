@@ -1,5 +1,21 @@
 # Release Notes
 
+### 11/11/2022
+
+1. Added DOCA 1.5.0 support
+2. Added support for Ubuntu 22.04 and Rocky 8.6 as a supported host operating system. This will require additional testing around Rocky Linux.
+3. Consolidate DOCA download links into the group_vars / all / main.yml for the install_bfb and install_bfb_bmc roles
+4. Updated the x86 packages for DOCA 1.5.0. As part of any major or minor release, the following will need to be updated:
+   i. group_vars/all/main.yml -> add the updated link to the new DOCA BFB file
+   ii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
+   iii. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
+5. Added the ability to use a development BFB over the host rshim without passing command-line arguments. Details in the README and in the inventory file
+6. Consolidated "build_bfb_cfg" and "build_bfb_cfg_bmc" roles into "build_bfb_cfg"
+7. Created the "sfcenabled" global variable which configures the DPUs for an SFC DOCA installation. This is configured in the group_vars > all > main.yml location
+8. Paused the plays to give the rshim more time to start during a DOCA install
+9. Reworked the "check_device_up" role based on a host-based install
+10. Timeout fixes to the bfb_install_bmc roles
+
 ### 10/29/2022
 
 1. Added support for installing DOCA over the DPU BMC of compatible cards

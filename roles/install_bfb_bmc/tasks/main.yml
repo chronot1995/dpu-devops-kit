@@ -21,8 +21,8 @@
 #
 ###############################################################################
 
-## This pulls in the variables file from the networking role
-## This is used in the last play to verify the DPU is back online
+# This will pull in the variables file from the install_bfb role
+# rather than have two different var files which could get out of sync
 
 - name: Role - bmc_board_type
   import_role:
@@ -40,7 +40,6 @@
       debug:
         msg: 'Install on a Production BMC Board commencing'
 
-    # The development BFB and URL are stored in the group_vars/all.yaml file
     - name: Checking if BFB has been downloaded
       stat:
         path: '/tmp/{{ doca_bfb }}'
@@ -62,9 +61,9 @@
 
     - name: Building the Prod BFB
       block:
-        - name: Role - build_bfb_cfg_bmc
+        - name: Role - build_bfb_cfg
           import_role:
-            name: build_bfb_cfg_bmc
+            name: build_bfb_cfg
           delegate_to: localhost
 
         - name: Add bf.cfg to BFB file
@@ -82,16 +81,16 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    - name: Pause 10 seconds
+    - name: Pause 30 seconds for rshim
       pause:
-        seconds: 10
+        seconds: 30
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
       command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ prod_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
       register: scptobmc
       delegate_to: localhost
-      failed_when: "'truncate' not in scptobmc.stderr"
+      ignore_errors: yes
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
@@ -152,9 +151,9 @@
 
     - name: Building the Dev BFB
       block:
-        - name: Role - build_bfb_cfg_bmc
+        - name: Role - build_bfb_cfg
           import_role:
-            name: build_bfb_cfg_bmc
+            name: build_bfb_cfg
           delegate_to: localhost
 
         - name: Add bf.cfg to BFB file
@@ -172,16 +171,16 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    - name: Pause 10 seconds
+    - name: Pause 30 seconds
       pause:
-        seconds: 10
+        seconds: 30
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
       command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ dev_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
       register: scptobmc
       delegate_to: localhost
-      failed_when: "'truncate' not in scptobmc.stderr"
+      ignore_errors: yes
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:

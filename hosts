@@ -1,4 +1,4 @@
-### ALL / GLOBAL VARIABLES ###
+### ALL / GLOBAL VARIABLES
 
 [all:vars]
 ansible_user=ubuntu
@@ -6,40 +6,46 @@ ansible_password=ubuntu
 ansible_sudo_pass=ubuntu
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 discovered_interpreter_python="/usr/bin/python3"
-# these must be properly set if you wish to deploy DOCA Service containers from NGC
-ngc_api_key=""
-ngc_org=""
 
-### DPU VARIABLES ###
+# These must be properly set if you wish to deploy DOCA Service containers from NGC
+
+# ngc_api_key=""
+# ngc_org=""
+
+### DPU VARIABLES
 
 [dpus]
+dpu_oob ansible_host=10.150.106.174
+
 # This is the IP address of the DPU OOB management interface.
 # The "dpus" group is required in the PoC Kit
-dpu_oob ansible_host=10.150.106.174 parent_host=x86
 
-[dpus:vars]
 # Uncomment this if the username or password is not "ubuntu"
+# [dpus:vars]
 # ansible_user=ubuntu
 # ansible_password=ubuntu
 
-### HOST VARIABLES ###
+### HOST VARIABLES
 
 [x86_hosts]
+x86 ansible_host=10.150.170.174
+
+# Adding "board=dev" to the end of an x86 host will install a development version of DOCA to the DPU
+
 # This is the IP address of the x86 host containing the DPU
 # This IP should be set to be something you can SSH to from the machine running Ansible
 # or if you are running Ansible directly on the host, 127.0.0.1
-# The "x86_hosts" group is required in the PoC Kit
-x86 ansible_host=10.150.170.174
 
-[x86_hosts:vars]
+# The "x86_hosts" group is required in the PoC Kit
+
 # Uncomment this if the username or password is not "ubuntu"
+# [x86_hosts:vars]
 # ansible_user=nvidia
 # ansible_password=nvidia
 
-### HOST BMC / IDRAC VARIABLES ###
+### HOST BMC / IDRAC VARIABLES
 
-# Uncomment the [x86_host_bmcs] group and vars below in order to use the "reboot_os_redux" role
-
+# Uncomment the [x86_host_bmcs] group and vars below in order to use the "reboot_os" role
 # [x86_host_bmcs]
 # dpu_example_host_bmc ansible_host=10.10.10.10
 
@@ -47,9 +53,9 @@ x86 ansible_host=10.150.170.174
 # ansible_user=nvidia
 # ansible_password=nvidia
 
-### DPU BMC VARIABLES ###
+### DPU BMC VARIABLES
 
-# Uncomment the [dpu_bmc] group and vars below in order to use the "reboot_os_redux" role
+# Uncomment the [dpu_bmc] group and vars below in order to use the "reboot_os" role
 
 # [dpu_bmcs]
 # dpu_example_bmc ansible_host=10.10.150.150 bmc_mac=10:10:10:10:10:10

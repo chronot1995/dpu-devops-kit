@@ -21,44 +21,118 @@
 #
 ###############################################################################
 
-## This pulls in the variables file from the networking role
-## This is used in the last play to verify the DPU is back online
+- name: Production DOCA Image install
+  block:
+    - name: Board Type Annoucement
+      debug:
+        msg: 'Install on a Production DPU commencing'
 
-- name: Checking if BFB has been downloaded
-  stat:
-    path: '/tmp/{{ doca_bfb }}'
-  register: bfbdownload
+    - name: Checking if BFB has been downloaded
+      stat:
+        path: '/tmp/{{ doca_bfb }}'
+      register: bfbdownload
 
-- name: Download bfb from the Internet
-  get_url:
-    url: '{{ bfb_download_url }}'
-    dest: '/tmp'
-  when: not bfbdownload.stat.exists
+    - name: Download bfb from the Internet
+      get_url:
+        url: '{{ bfb_download_url }}'
+        dest: '/tmp'
+      when: not bfbdownload.stat.exists
 
-- name: Role - build_bfb_cfg
-  import_role:
-    name: build_bfb_cfg
+    - name: Role - build_bfb_cfg
+      import_role:
+        name: build_bfb_cfg
 
-- name: Load bfb into bf2...this will take a while # noqa 305
-  shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
-  # [305] Use shell only when shell functionality is required
-  changed_when: false
+    - name: Stop rshim, if running
+      ansible.builtin.systemd:
+        name: rshim
+        state: stopped
 
-- name: Remove bf.cfg file
-  file:
-    path: /tmp/bf.cfg
-    state: absent
+    - name: Start rshim, if running
+      ansible.builtin.systemd:
+        name: rshim
+        state: started
 
-# this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
-- name: Ensure ssh config file is in place
-  template:
-    src: rshimX.conf.j2
-    dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
-    mode: 0644
+    - name: Pause 30 seconds for rshim
+      pause:
+        seconds: 30
 
-- name: Pause for 2 minutes - DPU needs to catch its breath
-  pause:
-    minutes: 2
-# - name: Role - rshim_check
-#   import_role:
-#     name: rshim_check
+    - name: Load bfb into bf2...this will take a while # noqa 305
+      shell: 'bfb-install --bfb /tmp/{{ doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
+      changed_when: false
+
+    - name: Remove bf.cfg file
+      file:
+        path: /tmp/bf.cfg
+        state: absent
+
+    # this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
+    - name: Ensure ssh config file is in place
+      template:
+        src: rshimX.conf.j2
+        dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
+        mode: 0644
+
+    - name: Pause for 5 minutes - DPU needs to catch its breath
+      pause:
+        minutes: 5
+
+  when: board is not defined
+
+- name: Development DOCA Image install
+  block:
+    - name: Board Type Annoucement
+      debug:
+        msg: 'Install on a Development DPU commencing'
+
+    - name: Checking if BFB has been downloaded
+      stat:
+        path: '/tmp/{{ dev_doca_bfb }}'
+      register: bfbdownload
+
+    - name: Download bfb from the Internet
+      get_url:
+        url: '{{ dev_bfb_download_url }}'
+        dest: '/tmp'
+      when: not bfbdownload.stat.exists
+
+    - name: Role - build_bfb_cfg
+      import_role:
+        name: build_bfb_cfg
+
+    - name: Stop rshim, if running
+      ansible.builtin.systemd:
+        name: rshim
+        state: stopped
+
+    - name: Start rshim, if running
+      ansible.builtin.systemd:
+        name: rshim
+        state: started
+
+    - name: Pause 30 seconds for rshim
+      pause:
+        seconds: 30
+
+    - name: Load bfb into bf2...this will take a while # noqa 305
+      shell: 'bfb-install --bfb /tmp/{{ dev_doca_bfb }} --config /tmp/bf.cfg --rshim rshim{{ rshim_num }}'
+      changed_when: false
+
+    - name: Remove bf.cfg file
+      file:
+        path: /tmp/bf.cfg
+        state: absent
+
+    # this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
+    - name: Ensure ssh config file is in place
+      template:
+        src: rshimX.conf.j2
+        dest: /etc/ssh/ssh_config.d/rshim{{ rshim_num }}.conf
+        mode: 0644
+
+    - name: Pause for 5 minutes - DPU needs to catch its breath
+      pause:
+        minutes: 5
+
+  when:
+    - board is defined
+    - board == 'dev'
