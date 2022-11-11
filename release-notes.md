@@ -1,6 +1,6 @@
 # Release Notes
 
-### 11/10/2022
+### 11/11/2022
 
 1. Added DOCA 1.5.0 support
 2. Added support for Ubuntu 22.04 and Rocky 8.6 as a supported host operating system. This will require additional testing around Rocky Linux.
@@ -14,6 +14,7 @@
 7. Created the "sfcenabled" global variable which configures the DPUs for an SFC DOCA installation. This is configured in the group_vars > all > main.yml location
 8. Paused the plays to give the rshim more time to start during a DOCA install
 9. Reworked the "check_device_up" role based on a host-based install
+10. Timeout fixes to the bfb_install_bmc roles
 
 ### 10/29/2022
 
