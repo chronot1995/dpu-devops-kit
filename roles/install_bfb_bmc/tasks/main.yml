@@ -90,7 +90,7 @@
       command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ prod_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
       register: scptobmc
       delegate_to: localhost
-      failed_when: "'truncate' not in scptobmc.stderr"
+      ignore_errors: yes
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
@@ -171,16 +171,16 @@
     - name: Start rshim on the BMC 2/2
       ansible.builtin.raw: /bin/bash -c "systemctl start rshim"
 
-    - name: Pause 10 seconds
+    - name: Pause 30 seconds
       pause:
-        seconds: 10
+        seconds: 30
 
     # This process takes over 20 mins
     - name: SCP BFB to BMC Rshim
       command: 'sshpass -p "{{ ansible_password }}" scp -oStrictHostKeyChecking=no /tmp/{{ dev_doca_bfb }} {{ ansible_user }}@{{ ansible_host }}:/dev/rshim0/boot'
       register: scptobmc
       delegate_to: localhost
-      failed_when: "'truncate' not in scptobmc.stderr"
+      ignore_errors: yes
 
     - name: Pause for 10 minutes - DPU OS Install
       pause:
