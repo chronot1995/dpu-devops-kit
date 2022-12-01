@@ -20,21 +20,26 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-- name: Start Mellanox Software Tools (mst)
-  shell: 'mst start' # noqa 305
-  changed_when: false
-  # [305] Use shell only when shell functionality is required
+- name: Check if VPI Board - Skipped if not VPI card
+  shell: "mlxconfig q | grep -i ^Description " # noqa 305
+  register: dpu_version
 
-- name: Grep BF device
-  shell: "set -o pipefail && mst status | grep -i '/dev/' | awk -F ' ' '{print $1}'" # noqa 305
-  args:
-    executable: /usr/bin/bash
-  register: grep_output
-  changed_when: false
-  # [305] Use shell only when shell functionality is required
+- name: Enable Infiniband on VPI card
+  block:
+    - name: Start Mellanox Software Tools (mst)
+      shell: "mst start" # noqa 305
+      changed_when: false
 
-- name: Enable Link Type Infiniband on the DPU
-  shell: 'mlxconfig -y -d {{ grep_output.stdout }} set LINK_TYPE_P1=1 LINK_TYPE_P2=1' # noqa 305
-  changed_when: false
-  ignore_errors: yes
-  # [305] Use shell only when shell functionality is required
+    - name: Grep BF device
+      shell: "set -o pipefail && mst status | grep -i '/dev/' | awk -F ' ' '{print $1}'" # noqa 305
+      args:
+        executable: /usr/bin/bash
+      register: grep_output
+      changed_when: false
+
+    - name: Enable Link Type Infiniband on the DPU
+      shell: "mlxconfig -y -d {{ grep_output.stdout }} set LINK_TYPE_P1=1 LINK_TYPE_P2=1" # noqa 305
+      changed_when: false
+      ignore_errors: yes
+
+  when: '"vpi" in dpu_version.stdout'
