@@ -30,9 +30,9 @@
       include_role:
         name: install_ngc_cli
 
-    - name: Role - ngc_containerd_sfc_setup
+    - name: Role - ngc_containerd_setup
       include_role:
-        name: ngc_containerd_sfc_setup
+        name: ngc_containerd_setup
 
     - name: Role - deploy_doca_hbn_container
       include_role:
