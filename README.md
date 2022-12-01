@@ -324,9 +324,13 @@ ansible-playbook doca-setup.yml -e x86_reboot=false -e bfb_install=true
 
 Sets up the environment for dpdk and checks if the hw can be initialized via testpmd. dpdk libs and testpmd need to be installed separately or via doca-setup.
 
+[DPDK Setup README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/install_dpu_dpdk/README.md)
+
 ### `poc-dhcp-server.yml`
 
 Configures an Ubuntu server to be a DHCP server with ISC-DHCP. This is a basic configuration designed to help with POC/lab environments.
+
+[DHCP Server README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/dhcp_server/README.md)
 
 ### `poc-doca-all-containers.yml`
 
@@ -334,36 +338,55 @@ Deploys 3x VFs on the host and all of the NGC containers on the DPU. Will prompt
 
 ### `poc-doca-ar-container.yml`
 
-Deploys the Application Regcogition container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.  
+Deploys the Application Recognition container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.
+
+[DOCA Application Recognition Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_ar_container/README.md)
+
 More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca_application_recognition
 
 ### `poc-doca-devel-container.yml`
 
-Deploys the DOCA development container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.  
+Deploys the DOCA development container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.
+
+[DOCA Development Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_devel_container/README.md)
+
 More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca
 
 ### `poc-doca-ips-container.yml`
 
-Deploys the IPS container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.  
+Deploys the IPS container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.
+
+[DOCA IPS Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_ips_container/README.md)
+
 More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca_ips
 
 ### `poc-doca-telemetry-container.yml`
 
-Deploys the DOCA Telemetry container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.  
+Deploys the DOCA Telemetry container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.
+
+[DOCA Telemetry Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_telemetry_container/README.md)
+
 More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca_telemetry
 
 ### `poc-doca-url-filter-container.yml`
 
-Deploys the URL Filter container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.  
+Deploys the URL Filter container from NGC. Will prompt for NGC credentials and org if NGC is not installed and configured.
+
+[DOCA URL Filter Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_url_filter_container/README.md)
+
 More info here: https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca_url_filter
 
 ### `poc-embedded-mode.yml`
 
 Enables embedded mode on the DPU.
 
+[DPU Embedded Mode README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/tree/main/roles/embedded_mode)
+
 ### `poc-doca-firefly.yml`
 
 Deployes the DOCA Firefly PTP container. This changes your DPU to separated host mode and is not currently compatible with other embedded mode DPU use cases and functions.
+
+[DOCA Firefly Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_firefly_container/README.md)
 
 ### `poc-doca-dpu-morpheus.yml`
 
@@ -373,37 +396,55 @@ Deploys the DOCA flow inspector and DOCA telemetry service to point to a Morpeus
 
 Deploys the DOCA HBN (Host Based Networking) Service on the DPU. DOCA HBN provides classic top of rack (ToR) routing/switching/network overlay capabilities on the DPU for the host.
 
+[DOCA HBN Container README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/deploy_doca_hbn_container/README.md)
+
 ### `poc-grafana.yml`
 
 Configures and deploys the Grafana Cloud monitoring agent unto the DPU
+
+[Grafana unto the DPU README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/grafana-monitoring/README.md)
 
 ### `poc-host-restricted-disable.yml`
 
 Disables restricted mode on the DPU.
 
+[Disabled Host Restricted Mode README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/restricted_mode_disable/README.md)
+
 ### `poc-host-restricted-enable.yml`
 
 Enables restricted mode on the DPU.
+
+[Enable Host Restricted Mode README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/restricted_mode_enable/README.md)
 
 ### `poc-ktls.yml`
 
 Builds and installs openssl and associated ktls enabled applications for demonstrating ktls offload
 
+[kTLS README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/ktls/README.md)
+
 ### 'poc-link-type-ethernet.yml'
 
 Enable the Ethernet link type for the DPU
+
+[Enable Ethernet](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/link_type_ethernet/README.md)
 
 ### 'poc-link-type-infiniband.yml'
 
 Enable the Infiniband link type for the DPU
 
+[Enable Infiniband README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/link_type_infiniband/README.md)
+
 ### `poc-nic-mode-enable.yml`
 
 Disables NIC mode / Connect X mode on the DPU.
 
+[NIC Mode Enable README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/nic_mode_enable/README.md)
+
 ### `poc-nic-mode-disable.yml`
 
 Disables NIC mode / Connect X mode on the DPU.
+
+[NIC Mode Disable README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/nic_mode_disable/README.md)
 
 ### `poc-reinstall-bfb.yml`
 
@@ -413,13 +454,20 @@ Installs a fresh BFB image, networking, and utility software to the DPU
 
 Delete, re-add, and reset Open VSwitch / OVS on the DPU. This is an easier step than reinstalling the BFB
 
+[Reset OVS README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/reset_ovs/README.md)
+
 ### `poc-separated-mode.yml`
 
 Enables separated mode on the DPU.
 
+[Separated Mode README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/separated_mode/README.md)
+
 ### 'poc-sshkeys.yml'
 
 Installs the SSH Keys on the DPU and x86 for passwordless authentication
+
+[Create SSH Keys README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/sshkeyscreate/README.md)
+[Install SSH Keys README](https://gitlab.com/nvidia/networking/bluefield/dpu-devops-kit/-/blob/main/roles/sshkeysinstall/README.md)
 
 ### 'poc-test-inventory.yml'
 
