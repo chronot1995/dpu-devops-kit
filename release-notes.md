@@ -2,9 +2,10 @@
 
 ### 12/1/2022
 
-1. Updated the reboot role for HBN
-2. Added links in the project README to the specific READMEs for the various roles
-3. Documentation updates
+1. Added a VPI card check to the Ethernet and Infiniband roles
+2. Updated the reboot role for HBN
+3. Added links in the project README to the specific READMEs for the various roles
+4. Documentation updates
 
 ### 11/11/2022
 
