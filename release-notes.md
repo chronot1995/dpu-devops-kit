@@ -1,5 +1,11 @@
 # Release Notes
 
+### 12/1/2022
+
+1. Updated the reboot role for HBN
+2. Added links in the project README to the specific READMEs for the various roles
+3. Documentation updates
+
 ### 11/11/2022
 
 1. Added DOCA 1.5.0 support
