@@ -24,20 +24,21 @@
 - hosts: x86_hosts
   become: yes
   vars_prompt:
-    - name: 'onward'
-      prompt: 'Are you sure you want to reinstall and reset the Bluefield? (Yes/No)'
+    - name: 'bfb_prompt'
+      prompt: 'Would you like to install a new BFB on the Bluefield? (Yes/No)'
       default: 'Yes'
       private: no
   roles:
-    - role: onward
-      tags: ['onward']
+    - role: precheck
+      tags: ['precheck']
 
     - role: networking
       tags: ['networking']
 
     - role: install_bfb
       tags: ['install_bfb']
-      when: onward|bool
+      when:
+        - bfb_prompt|bool
 
 # Run this role quick after bfb install to drop custom facts
 # No need to gather facts here, but need to gather facts after this
@@ -45,6 +46,9 @@
   become: yes
   gather_facts: no
   roles:
+    - role: check_device_up
+      tags: ['check_device_up']
+
     - role: dpu_custom_facts
       tags: ['dpu_custom_facts']
 
@@ -53,6 +57,9 @@
   roles:
     - role: reset_dpu_configuration
       tags: ['reset_dpu_configuration']
+
+    - role: link_type_ethernet
+      tags: ['link_type_ethernet']
 
     - role: networking
       tags: ['networking']

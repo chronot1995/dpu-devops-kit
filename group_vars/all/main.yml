@@ -6,7 +6,7 @@ l_csi_0333d_dpus:
   - l_csi_bf2_25g_12
   - l_csi_bf2_25g_04
 
-chrony_timezone: 'America/Los_Angeles'
+chrony_timezone: "America/Los_Angeles"
 
 ### SFC Enabled ###
 
@@ -14,14 +14,20 @@ chrony_timezone: 'America/Los_Angeles'
 
 ### DOCA IMAGES AND URLS ###
 
+# DOCA 1.5.1 / BFB 3.9.3:
+# Production / Signed Image:
+doca_bfb: "DOCA_1.5.1_BSP_3.9.3_Ubuntu_20.04-4.2211-LTS.signed.bfb"
+bfb_download_url: "http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}"
+# Development / Unsigned Image:
+dev_doca_bfb: "DOCA_1.5.1_BSP_3.9.3_Ubuntu_20.04-4.2211-LTS.bfb"
+dev_bfb_download_url: "http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}"
 # DOCA 1.5.0 / BFB 3.9.3:
 # Production / Signed Image:
-doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.signed.bfb'
-bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
+# doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.signed.bfb'
+# bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'
 # Development / Unsigned Image:
-dev_doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.bfb'
 # dev_doca_bfb: 'DOCA_1.5.0_BSP_3.9.3_Ubuntu_20.04-11.bfb'
-dev_bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}'
+# dev_bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ dev_doca_bfb }}'
 # DOCA 1.4.0 / BFB 3.9.2:
 # doca_bfb: 'DOCA_1.4.0_BSP_3.9.2_Ubuntu_20.04-4.signed.bfb'
 # bfb_download_url: 'http://www.mellanox.com/downloads/BlueField/BFBs/Ubuntu20.04/{{ doca_bfb }}'

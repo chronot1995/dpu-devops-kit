@@ -20,9 +20,12 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
+# DOCA 1.5.1 / BFB 3.9.3
+doca_url: "https://content.mellanox.com/DOCA/DOCA_v1.5.1/"
+doca_file: "doca-dpu-repo-ubuntu2004-local_1.5.0055-1.5.8.1.0.1.1.bf.3.9.3.12383.11_arm64.deb"
 # DOCA 1.5.0 / BFB 3.9.3
-doca_url: 'https://content.mellanox.com/DOCA/DOCA_v1.5.0/'
-doca_file: 'doca-dpu-repo-ubuntu2004-local_1.5.0055-1.5.8.1.0.1.1.bf.3.9.3.12383.11.signed_arm64.deb'
+# doca_url: 'https://content.mellanox.com/DOCA/DOCA_v1.5.0/'
+# doca_file: 'doca-dpu-repo-ubuntu2004-local_1.5.0055-1.5.8.1.0.1.1.bf.3.9.3.12383.11.signed_arm64.deb'
 # DOCA 1.4.0 / BFB 3.9.2
 # doca_url: 'https://www.mellanox.com/downloads/DOCA/DOCA_v1.4.0'
 # doca_file: 'doca-repo-aarch64-ubuntu2004-local_1.4.0079-1.5.7.1.0.2.0.bf.3.9.2.12271_arm64.deb'
