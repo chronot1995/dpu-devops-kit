@@ -1,5 +1,15 @@
 # Release Notes
 
+### 12/3/2022
+
+1. Added DOCA 1.5.1 support
+2. Updated the x86 packages for DOCA 1.5.1. As part of any major or minor release, the following will need to be updated:
+   i. group_vars/all/main.yml -> add the updated link to the new DOCA BFB file
+   ii. roles/install_server_doca/vars -> add an updated Ubuntu and RHEL deb / rpm for the x86 install packages
+   iii. roles/install_dpu_doca/vars - add an updated Ubuntu deb for the ARM / DPU install packages
+3. Updated the doca-setup.yml to set Ethernet for VPI cards
+4. Updated the poc-reinstall-bfb.yml to use the same plays as the doca-setup.yml
+
 ### 12/1/2022
 
 1. Added a VPI card check to the Ethernet and Infiniband roles
