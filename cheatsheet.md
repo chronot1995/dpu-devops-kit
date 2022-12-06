@@ -70,7 +70,7 @@ DOCA_1.3.0_BSP_3.9.0_Ubuntu_20.04-6.signed
 pkg-config --modversion libdpdk
 20.11.4.1.9
 
-8. Type of image:
+8. Type of image via the DPU:
 
 Signed image = "GA Secured"
 
@@ -97,6 +97,15 @@ watchdog-swap: disabled
 lifecycle state: Secured (development)
 secure boot key free slots: 3
 ```
+
+8.5 Type of image via the DPU BMC:
+
+```
+i2ctransfer -y 7 w2@0x55 0x00 0x02 r5
+```
+
+Production Card = 0x40
+Development Card = 0x44
 
 9. Reset the DPU from the x86 host:
 
