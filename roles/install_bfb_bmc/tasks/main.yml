@@ -38,24 +38,24 @@
   block:
     - name: Board Type Annoucement
       debug:
-        msg: 'Install on a Production BMC Board commencing'
+        msg: "Install on a Production BMC Board commencing"
 
     - name: Checking if BFB has been downloaded
       stat:
-        path: '/tmp/{{ doca_bfb }}'
+        path: "/tmp/{{ doca_bfb }}"
       register: bfbdownload
       delegate_to: localhost
 
     - name: Download bfb from the Internet
       get_url:
-        url: '{{ bfb_download_url }}'
-        dest: '/tmp'
+        url: "{{ bfb_download_url }}"
+        dest: "/tmp"
       delegate_to: localhost
       when: not bfbdownload.stat.exists
 
     - name: Checking if new Production BFB has been created
       stat:
-        path: '/tmp/new.bfb'
+        path: "/tmp/new.bfb"
       register: newbfbbuilt
       delegate_to: localhost
 
@@ -101,17 +101,17 @@
         name: check_device_up
       delegate_to: localhost
 
-    - name: Remove bf.cfg file
-      file:
-        path: /tmp/bf.cfg
-        state: absent
-      delegate_to: localhost
+    # - name: Remove bf.cfg file
+    #   file:
+    #     path: /tmp/bf.cfg
+    #     state: absent
+    #   delegate_to: localhost
 
-    - name: Remove newly created BFB file
-      file:
-        path: /tmp/{{ prod_doca_bfb }}
-        state: absent
-      delegate_to: localhost
+    # - name: Remove newly created BFB file
+    #   file:
+    #     path: /tmp/{{ prod_doca_bfb }}
+    #     state: absent
+    #   delegate_to: localhost
 
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
@@ -127,25 +127,25 @@
   block:
     - name: Board Type Annoucement
       debug:
-        msg: 'Install on a Development BMC Board commencing'
+        msg: "Install on a Development BMC Board commencing"
 
     # The development BFB and URL variables are stored in the vars/main.yaml file within this role
     - name: Checking if BFB has been downloaded
       stat:
-        path: '/tmp/{{ dev_doca_bfb }}'
+        path: "/tmp/{{ dev_doca_bfb }}"
       register: bfbdownload
       delegate_to: localhost
 
     - name: Download bfb from the Internet
       get_url:
-        url: '{{ dev_bfb_download_url }}'
-        dest: '/tmp'
+        url: "{{ dev_bfb_download_url }}"
+        dest: "/tmp"
       delegate_to: localhost
       when: not bfbdownload.stat.exists
 
     - name: Checking if new Development BFB has been created
       stat:
-        path: '/tmp/dev.bfb'
+        path: "/tmp/dev.bfb"
       register: devbfbbuilt
       delegate_to: localhost
 
@@ -191,17 +191,17 @@
         name: check_device_up
       delegate_to: localhost
 
-    - name: Remove bf.cfg file
-      file:
-        path: /tmp/bf.cfg
-        state: absent
-      delegate_to: localhost
+    # - name: Remove bf.cfg file
+    #   file:
+    #     path: /tmp/bf.cfg
+    #     state: absent
+    #   delegate_to: localhost
 
-    - name: Remove newly created BFB file
-      file:
-        path: /tmp/{{ dev_doca_bfb }}
-        state: absent
-      delegate_to: localhost
+    # - name: Remove newly created BFB file
+    #   file:
+    #     path: /tmp/{{ dev_doca_bfb }}
+    #     state: absent
+    #   delegate_to: localhost
 
     - name: Pause for 2 minutes - DPU needs to catch its breath
       pause:
