@@ -1,5 +1,8 @@
 ubuntu_PASSWORD='{{ hostvars[groups['dpus'][0]]['ansible_password'] | password_hash("md5") }}'
-NET_RSHIM_MAC={{ "52:54:00" | community.general.random_mac(seed=inventory_hostname) }}
+{% if rshim_mac == 'random' %}
+{% set rshim_mac = '52:54:00' | community.general.random_mac(seed=inventory_hostname) %}
+{% endif %}
+NET_RSHIM_MAC={{ dpu_rshim_mac }}
 
 bfb_modify_os()
 {
