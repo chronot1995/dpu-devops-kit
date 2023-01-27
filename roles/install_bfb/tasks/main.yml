@@ -65,6 +65,28 @@
         path: /tmp/bf.cfg
         state: absent
 
+    - name: Convert rshim_mac to IPv6 LLA
+      command: /usr/bin/env python3
+      args:
+        stdin: |
+           rshim_mac_split = "{{ dpu_rshim_mac }} "
+           rshim_mac_split = rshim_mac_split.split(":")
+           rshim_mac_split.insert(3, "ff")
+           rshim_mac_split.insert(4, "fe")
+           rshim_mac_split[0] = "%02x" % (int(rshim_mac_split[0], 16) ^ 2)
+           rshim_lla_split = []
+           for i in range(0, len(rshim_mac_split), 2):
+               rshim_lla_split.append("".join(rshim_mac_split[i:i+2]))
+
+           rshim_lla = "fe80::" + (":".join(rshim_lla_split))
+           print(rshim_lla)
+      register: rshim_lla_output
+
+    - set_fact:
+        rshim_lla: "{{ rshim_lla_output.stdout.strip() }}"
+
+    - debug:
+        msg: "{{ rshim_lla }}"
     # this drops an ssh client config file that allows you to do 'ssh rshim0' or 'ssh rshim1' and use the ipv6 link local addresses
     - name: Ensure ssh config file is in place
       template:

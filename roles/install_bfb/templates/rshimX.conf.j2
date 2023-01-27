@@ -1,5 +1,5 @@
 Host rshim{{ rshim_num }}
-    HostName fe80::21a:caff:feff:ff01%%tmfifo_net{{ rshim_num }}
+    HostName {{ rshim_lla }}%%tmfifo_net{{ rshim_num }}
     User ubuntu
     AddressFamily inet6
     StrictHostKeyChecking no
