@@ -32,6 +32,16 @@
 #     dest: /tmp/network-config
 #     mode: 0755
 
+- name: Compute DPU's rshim mac
+  set_fact:
+    dpu_rshim_mac: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
+  when: rshim_mac == "random"
+
+- name: Compute DPU's rshim mac
+  set_fact:
+    dpu_rshim_mac: "{{ rshim_mac }}"
+  when: rshim_mac != "random"
+
 - name: Build bf.cfg for HBN with SFC from the template
   template:
     src: bf-sfc.j2
@@ -39,7 +49,7 @@
     mode: 0755
   when:
     - sfcenabled is defined
-    - sfcenabled is true
+    - sfcenabled|bool == True
 
 - name: Build bf.cfg file from the template
   template:
@@ -47,3 +57,11 @@
     dest: /tmp/bf.cfg
     mode: 0755
   when: sfcenabled is not defined
+
+- name: "Read bf.cfg"
+  shell: |
+    cat /tmp/bf.cfg
+  register: bf_cfg_content
+
+- debug:
+    msg: "{{ bf_cfg_content }}"
