@@ -107,8 +107,6 @@
           - doca-runtime
           - doca-tools
 
-    - meta: end_play
-
   when:
     - ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'
 
