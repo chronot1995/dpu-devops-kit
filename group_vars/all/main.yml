@@ -14,7 +14,7 @@ chrony_timezone: "America/Los_Angeles"
 
 ### BF Firmwave Update Workflow ###
 
-# bffwupdate: true
+bffwupdate: true
 
 ### DOCA IMAGES AND URLS ###
 
