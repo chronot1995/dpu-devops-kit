@@ -65,7 +65,9 @@
     src: bf.j2
     dest: /tmp/bf.cfg
     mode: 0755
-  when: sfcenabled is not defined
+  when:
+    - sfcenabled is not defined
+    - bffwupdate is not defined
 
 - name: "Read bf.cfg"
   shell: |
