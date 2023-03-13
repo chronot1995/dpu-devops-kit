@@ -1,5 +1,10 @@
 # Release Notes
 
+### 03/12/2023
+
+1. Added the ability to install a BFB and do a firmware update in a single reboot.
+2. This functionality is documented in the build_bfb_cfg README file.
+
 ### 12/3/2022
 
 1. Added DOCA 1.5.1 support
