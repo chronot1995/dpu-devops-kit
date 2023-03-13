@@ -42,6 +42,15 @@
     dpu_rshim_mac: "{{ rshim_mac }}"
   when: rshim_mac != "random"
 
+- name: Build bf.cfg for with Firmware Update workflow
+  template:
+    src: bf-fw.j2
+    dest: /tmp/bf.cfg
+    mode: 0755
+  when:
+    - bffwupdate is defined
+    - bffwupdate|bool == True
+
 - name: Build bf.cfg for HBN with SFC from the template
   template:
     src: bf-sfc.j2
@@ -56,7 +65,9 @@
     src: bf.j2
     dest: /tmp/bf.cfg
     mode: 0755
-  when: sfcenabled is not defined
+  when:
+    - sfcenabled is not defined
+    - bffwupdate is not defined
 
 - name: "Read bf.cfg"
   shell: |

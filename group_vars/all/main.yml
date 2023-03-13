@@ -12,6 +12,10 @@ chrony_timezone: "America/Los_Angeles"
 
 # sfcenabled: true
 
+### BF Firmwave Update Workflow ###
+
+# bffwupdate: true
+
 ### DOCA IMAGES AND URLS ###
 
 # DOCA 1.5.1 / BFB 3.9.3:
